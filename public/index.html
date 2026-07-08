@@ -4,17 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wolfpack AI Chat</title>
-    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Univers+LT+Std:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --ncsu-red: #CC0000;
             --ncsu-white: #FFFFFF;
-            --ncsu-black: #000000;
-            --chat-bg: #F8F9FA;
-            --ai-bubble: #F1F3F4;
+            --ncsu-black: #111111;
+            --chat-bg: #F4F4F6;
+            --ai-bubble: #EAEAEA;
             --user-bubble: var(--ncsu-red);
-            --header-font: 'Libre Baskerville', serif;
-            --body-font: 'Univers LT Std', sans-serif;
+            --border-color: #E2E2E5;
         }
 
         * {
@@ -24,8 +22,8 @@
         }
 
         body {
-            font-family: var(--body-font);
-            background-color: #f0f0f0; /* Overall page background */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #E8E8EC;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -33,235 +31,293 @@
         }
 
         .chat-container {
-            width: 400px; /* Adjust as needed */
-            height: 600px; /* Adjust as needed */
+            width: 100%;
+            max-width: 480px;
+            height: 680px;
             background-color: var(--ncsu-white);
-            border-radius: 20px; /* Soft edges */
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1); /* Soft shadow */
+            border-radius: 24px; /* Premium soft curved edges */
+            box-shadow: 0 12px 36px rgba(0,0,0,0.08); /* Soft drop shadow */
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            margin: 20px;
         }
 
         .chat-header {
-            padding: 15px;
+            padding: 18px 24px;
             background-color: var(--ncsu-white);
-            border-bottom: 1px solid #e0e0e0;
+            border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            gap: 12px;
         }
 
-        .chat-header img.logo {
-            height: 30px;
+        .chat-header .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--ncsu-red);
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
         }
 
         .chat-header h1 {
-            font-family: var(--header-font);
-            font-size: 1.2rem;
+            font-size: 1.25rem;
             color: var(--ncsu-black);
-            font-weight: bold;
+            font-weight: 700;
+            letter-spacing: -0.3px;
         }
 
         .chat-messages {
             flex: 1;
-            padding: 20px;
+            padding: 24px;
             overflow-y: auto;
             background-color: var(--chat-bg);
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 18px;
+        }
+
+        .message-wrapper {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            max-width: 85%;
+        }
+
+        .message-wrapper.ai {
+            align-self: flex-start;
+        }
+
+        .message-wrapper.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        /* Local SVG Avatar styling */
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--ncsu-white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
         }
 
         .message {
-            max-width: 80%;
-            padding: 10px 15px;
-            border-radius: 15px; /* Softer edges */
-            line-height: 1.4;
-            position: relative;
+            padding: 12px 18px;
+            border-radius: 18px; /* Smooth bubble borders */
+            line-height: 1.5;
+            font-size: 0.95rem;
         }
 
-        .message.ai {
-            align-self: flex-start;
+        .message-wrapper.ai .message {
             background-color: var(--ai-bubble);
             color: var(--ncsu-black);
-            border-bottom-left-radius: 5px; /* Slightly distinct AI corner */
+            border-top-left-radius: 4px; /* Sleek asymmetric corner */
         }
 
-        .message.user {
-            align-self: flex-end;
+        .message-wrapper.user .message {
             background-color: var(--user-bubble);
             color: var(--ncsu-white);
-            border-bottom-right-radius: 5px; /* Slightly distinct user corner */
-        }
-
-        .ai-icon {
-            width: 24px;
-            height: 24px;
-            position: absolute;
-            left: -32px;
-            top: 10px;
+            border-top-right-radius: 4px; /* Sleek asymmetric corner */
         }
 
         .chat-input-area {
-            padding: 15px;
-            border-top: 1px solid #e0e0e0;
+            padding: 16px 20px;
+            background-color: var(--ncsu-white);
+            border-top: 1px solid var(--border-color);
             display: flex;
-            gap: 10px;
+            align-items: center;
+            gap: 12px;
         }
 
-        #userInput {
+        #user-input {
             flex: 1;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 25px; /* Fully rounded input */
+            padding: 14px 20px;
+            border: 1px solid var(--border-color);
+            background-color: var(--chat-bg);
+            border-radius: 26px; /* Pill input shape */
             outline: none;
-            font-family: var(--body-font);
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
         }
 
-        #sendBtn {
+        #user-input:focus {
+            border-color: var(--ncsu-red);
+            background-color: var(--ncsu-white);
+            box-shadow: 0 0 0 3px rgba(204, 0, 0, 0.1);
+        }
+
+        #send-btn {
             background-color: var(--ncsu-red);
-            color: white;
+            color: var(--ncsu-white);
             border: none;
-            padding: 0 20px;
-            border-radius: 25px; /* Rounded button */
-            font-family: var(--body-font);
-            font-weight: bold;
+            padding: 12px 24px;
+            border-radius: 26px;
+            font-size: 0.95rem;
+            font-weight: 600;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: background 0.2s ease;
         }
 
-        #sendBtn:hover {
-            background-color: #aa0000;
+        #send-btn:hover {
+            background-color: #A30000;
         }
 
-        /* --- Gemini Response Handling (Markdown) --- */
-        .message strong { font-weight: bold; }
+        /* --- Gemini Markdown Style Support --- */
+        .message strong { font-weight: 700; }
         .message em { font-style: italic; }
-        .message code { background: rgba(0,0,0,0.05); padding: 2px 4px; border-radius: 3px; font-family: monospace; }
-        .message ul, .message ol { padding-left: 20px; margin-top: 5px; }
-        .message li { margin-bottom: 3px; }
-        .message h1, .message h2, .message h3 { font-size: 1.1em; margin-top: 5px; margin-bottom: 5px; font-weight: bold; }
+        .message code { background: rgba(0,0,0,0.06); padding: 2px 5px; border-radius: 4px; font-family: monospace; font-size: 0.85em; }
+        .message-wrapper.user .message code { background: rgba(255,255,255,0.2); }
+        .message ul, .message ol { padding-left: 20px; margin: 8px 0; }
+        .message li { margin-bottom: 4px; }
+        .message h1, .message h2, .message h3 { font-size: 1.1rem; margin: 10px 0 6px 0; font-weight: 700; }
+        .message p { margin-bottom: 6px; }
+        .message p:last-child { margin-bottom: 0; }
     </style>
 </head>
 <body>
 
     <div class="chat-container">
         <header class="chat-header">
-            <img src="https://branding.ncsu.edu/logos/logos-main/WolfpackLogo_Block-S_Red.png" alt="NCSU Logo" class="logo">
+            <div class="logo-container">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="square">
+                    <path d="M19 7H7.5A2.5 2.5 0 0 0 5 9.5v0A2.5 2.5 0 0 0 7.5 12H16.5a2.5 2.5 0 0 1 2.5 2.5v0a2.5 2.5 0 0 1 -2.5 2.5H5" />
+                </svg>
+            </div>
             <h1>Wolfpack AI Chat</h1>
-            <div style="width:30px;"></div> </header>
+        </header>
 
-        <div class="chat-messages" id="chatMessages">
-            <div class="message ai">
-                <img src="https://branding.ncsu.edu/wp-content/uploads/2018/06/Icon_WolfpackRed_BlockS_24.png" alt="AI Icon" class="ai-icon">
-                <p>Hello, how can I help you today? Ask me about NC State or anything else!</p>
+        <div class="chat-messages" id="chat-window">
+            <div class="message-wrapper ai">
+                <div class="avatar">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#CC0000" stroke-width="2">
+                        <path d="M12 2a5 5 0 0 1 5 5v2a5 5 0 0 1-10 0V7a5 5 0 0 1 5-5zM21 21v-2a4 4 0 0 0-3-3.87M3 21v-2a4 4 0 0 1 3-3.87M16 19a4 4 0 0 1-8 0"/>
+                    </svg>
+                </div>
+                <div class="message">
+                    <p>Go Pack! 🐺 How can I help you today? Ask me anything.</p>
+                </div>
             </div>
         </div>
 
         <div class="chat-input-area">
-            <input type="text" id="userInput" placeholder="Message Wolfpack AI...">
-            <button id="sendBtn">Send</button>
+            <input type="text" id="user-input" placeholder="Message Wolfpack AI..." autocomplete="off">
+            <button id="send-btn">Send</button>
         </div>
     </div>
 
     <script>
+        const chatWindow = document.getElementById('chat-window');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+
+        // Text parsing framework engine to securely resolve Markdown notation flags from Gemini
         function renderMarkdown(text) {
-            // Simple markdown-to-HTML converter
-            text = text
-                .replace(/^#\s+(.*$)/gim, '<h1>$1</h1>') // H1
-                .replace(/^##\s+(.*$)/gim, '<h2>$1</h2>') // H2
-                .replace(/^###\s+(.*$)/gim, '<h3>$1</h3>') // H3
-                .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>') // Bold
-                .replace(/\*(.*?)\*/gim, '<em>$1</em>') // Italics
-                .replace(/```(.*?)```/gim, '<pre><code>$1</code></pre>') // Code Block
-                .replace(/`(.*?)`/gim, '<code>$1</code>'); // Inline Code
+            let html = text
+                .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+                .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+                .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+                .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/gim, '<em>$1</em>')
+                .replace(/`(.*?)`/gim, '<code>$1</code>');
 
-            // Simple handling for lists (unordered and ordered)
-            text = text.replace(/^\s*\n\*/gm, '<ul>\n*');
-            text = text.replace(/^\*/gm, '<li>');
-            text = text.replace(/<li>(.*?)\n/gm, '<li>$1</li>\n');
-            text = text.replace(/(\n<li>.*?<\/li>\n)+/gm, '<ul>$0</ul>');
-
-            text = text.replace(/^\s*\n\d+\./gm, '<ol>\n1.');
-            text = text.replace(/^\d+\./gm, '<li>');
-            text = text.replace(/<li>(.*?)\n/gm, '<li>$1</li>\n');
-            text = text.replace(/(\n<li>.*?<\/li>\n)+/gm, '<ol>$0</ol>');
-
-            return text;
+            // Formulate array matrices blocks for standard lists
+            const lines = html.split('\n');
+            let inList = false;
+            
+            for (let i = 0; i < lines.length; i++) {
+                if (lines[i].trim().startsWith('* ')) {
+                    lines[i] = lines[i].replace('* ', '<li>') + '</li>';
+                    if (!inList) {
+                        lines[i] = '<ul>' + lines[i];
+                        inList = true;
+                    }
+                } else if (inList) {
+                    lines[i] = '</ul>' + lines[i];
+                    inList = false;
+                }
+            }
+            if (inList) lines[lines.length - 1] += '</ul>';
+            
+            return lines.join('\n').replace(/\n/g, '<br>');
         }
-
-        // CHAT LOGIC
-
-        const chatMessages = document.getElementById('chatMessages');
-        const userInput = document.getElementById('userInput');
-        const sendBtn = document.getElementById('sendBtn');
 
         function appendMessage(text, sender) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${sender}`;
+            const wrapper = document.createElement('div');
+            wrapper.classList.add('message-wrapper', sender);
 
-            const messageP = document.createElement('p');
+            // Append appropriate local Vector Graphic markup blocks depending on engine node routing
+            const avatar = document.createElement('div');
+            avatar.classList.add('avatar');
+            if (sender === 'ai') {
+                avatar.innerHTML = `
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#CC0000" stroke-width="2">
+                        <path d="M12 2a5 5 0 0 1 5 5v2a5 5 0 0 1-10 0V7a5 5 0 0 1 5-5zM21 21v-2a4 4 0 0 0-3-3.87M3 21v-2a4 4 0 0 1 3-3.87M16 19a4 4 0 0 1-8 0"/>
+                    </svg>`;
+            } else {
+                avatar.innerHTML = `
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#666666" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/>
+                    </svg>`;
+            }
+
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
 
             if (sender === 'ai') {
-                // Add AI icon
-                const aiIcon = document.createElement('img');
-                aiIcon.src = "https://branding.ncsu.edu/wp-content/uploads/2018/06/Icon_WolfpackRed_BlockS_24.png";
-                aiIcon.alt = "AI Icon";
-                aiIcon.className = "ai-icon";
-                messageDiv.appendChild(aiIcon);
-
-                // Interpret Markdown for AI response
-                messageP.innerHTML = renderMarkdown(text);
+                messageDiv.innerHTML = renderMarkdown(text);
             } else {
-                messageP.textContent = text;
+                messageDiv.textContent = text;
             }
 
-            messageDiv.appendChild(messageP);
-            chatMessages.appendChild(messageDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight; // Auto-scroll
+            wrapper.appendChild(avatar);
+            wrapper.appendChild(messageDiv);
+            chatWindow.appendChild(wrapper);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+            return messageDiv;
         }
 
-        // Placeholder function for sending to Gemini API
-        function sendMessageToGemini(text) {
-            console.log(`Sending to Gemini: ${text}`);
-            appendMessage(text, 'user');
+        async function sendMessage() {
+            const prompt = userInput.value.trim();
+            if (!prompt) return;
+
+            appendMessage(prompt, 'user');
             userInput.value = '';
 
-            // Simulate AI response with formatting to test renderer
-            setTimeout(() => {
-                const simulatedResponse = `That's interesting! NC State is known for many things. Here are a few details about the university:\n\n* **Founded:** 1887\n* **Type:** Public land-grant research university\n* **Mascot:** Mr. and Ms. WUF (Wolfpack)\n\n### Notable Areas of Study:\n\n* Engineering\n* Agriculture and Life Sciences\n* Veterinary Medicine\n\nYou might also want to check out the **Hunt Library**, which is a world-class facility. Let me know if you have more questions!`;
-                appendMessage(simulatedResponse, 'ai');
-            }, 1000);
+            const thinkingBubble = appendMessage("Thinking...", 'ai');
 
-            // TODO: INTEGRATE ACTUAL GEMINI API FETCH HERE
-            /*
-            fetch('/your-api-endpoint', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: text })
-            })
-            .then(response => response.json())
-            .then(data => {
-                appendMessage(data.response, 'ai'); // data.response contains the Gemini markdown
-            })
-            .catch(error => {
-                console.error('Error connecting to Gemini:', error);
-                appendMessage('Sorry, I had trouble connecting.', 'ai');
-            });
-            */
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: prompt })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    thinkingBubble.innerHTML = renderMarkdown(data.text);
+                } else {
+                    thinkingBubble.textContent = `Error: ${data.error}`;
+                    thinkingBubble.style.color = '#CC0000';
+                }
+
+            } catch (error) {
+                thinkingBubble.textContent = "Fatal Connection Error.";
+                thinkingBubble.style.color = '#CC0000';
+                console.error("Fetch error:", error);
+            }
         }
 
-        sendBtn.addEventListener('click', () => {
-            if (userInput.value.trim() !== '') {
-                sendMessageToGemini(userInput.value);
-            }
-        });
-
+        sendBtn.addEventListener('click', sendMessage);
         userInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && userInput.value.trim() !== '') {
-                sendMessageToGemini(userInput.value);
-            }
+            if (e.key === 'Enter') sendMessage();
         });
     </script>
 </body>
