@@ -13,7 +13,7 @@
         }
 
         body {
-            font-family: "UniversLTStd", Helvetica, Arial, sans-serif; /* NCSU official font approximation */
+            font-family: "UniversLTStd", Helvetica, Arial, sans-serif;
             background-color: var(--ncsu-gray);
             margin: 0;
             display: flex;
@@ -53,10 +53,11 @@
             border-radius: 8px;
             padding: 20px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            overflow-y: auto; /* Allow scrolling */
+            overflow-y: auto;
             display: flex;
             flex-direction: column;
             gap: 10px;
+            min-height: 400px;
         }
 
         .message {
@@ -64,6 +65,7 @@
             border-radius: 8px;
             max-width: 75%;
             word-wrap: break-word;
+            white-space: pre-wrap;
         }
 
         .message.user {
@@ -122,7 +124,7 @@
         }
 
         button:hover {
-            background-color: #990000; /* Darker NCSU Red */
+            background-color: #990000;
         }
     </style>
 </head>
@@ -134,7 +136,8 @@
 
     <main>
         <div id="chat-window">
-            </div>
+            <div class="message gemini">Go Pack! How can I help you today?</div>
+        </div>
 
         <div id="input-area">
             <input type="text" id="user-input" placeholder="Ask Gemini something...">
@@ -147,30 +150,25 @@
         const userInput = document.getElementById('user-input');
         const sendBtn = document.getElementById('send-btn');
 
-        // Function to add a message bubble to the chat
         function addMessage(text, sender) {
             const messageDiv = document.createElement('div');
             messageDiv.classList.add('message', sender);
             messageDiv.textContent = text;
             chatWindow.appendChild(messageDiv);
-            chatWindow.scrollTop = chatWindow.scrollHeight; // Auto-scroll to bottom
+            chatWindow.scrollTop = chatWindow.scrollHeight;
         }
 
-        // The core function to talk to our Back-end
         async function sendMessage() {
-            const prompt = userInput.value;
+            const prompt = userInput.value.trim();
             if (!prompt) return;
 
-            // 1. Show user message
             addMessage(prompt, 'user');
-            userInput.value = ''; // Clear input
+            userInput.value = '';
 
-            // 2. Show loading state (simplistic)
             addMessage("Thinking...", 'gemini');
             const thinkingMessage = chatWindow.lastChild;
 
             try {
-                // 3. POST the prompt to OUR back-end, not Google.
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -179,9 +177,8 @@
 
                 const data = await response.json();
 
-                // 4. Handle response
                 if (response.ok) {
-                    thinkingMessage.textContent = data.text; // Replace loading text
+                    thinkingMessage.textContent = data.text;
                 } else {
                     thinkingMessage.textContent = `Error: ${data.error}`;
                     thinkingMessage.classList.add('error');
@@ -194,12 +191,10 @@
             }
         }
 
-        // Event listeners
         sendBtn.addEventListener('click', sendMessage);
         userInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') sendMessage();
         });
-
     </script>
 </body>
 </html>
