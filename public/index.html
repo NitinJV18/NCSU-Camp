@@ -3,70 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wolfpack AI Chat</title>
+    <title>Inside Alex's Brain - Simulation</title>
     <style>
         :root {
             --ncsu-red: #CC0000;
             --ncsu-white: #FFFFFF;
             --ncsu-black: #111111;
-            --chat-bg: #F4F4F6;
-            --ai-bubble: #EAEAEA;
-            --user-bubble: var(--ncsu-red);
-            --border-color: #E2E2E5;
+            --chat-bg: #F4F5F8;
+            --border-color: #E2E2E6;
+            
+            --brain-color: #2B6CB0;
+            --heart-color: #E53E3E;
+            --voice-color: #D69E2E;
+            --reality-color: #319795;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #E8E8EC;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background-color: #E9EAEF;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
         }
 
-        .chat-container {
-            width: 100%;
-            max-width: 480px;
-            height: 680px;
-            background-color: var(--ncsu-white);
-            border-radius: 24px; /* Premium soft curved edges */
-            box-shadow: 0 12px 36px rgba(0,0,0,0.08); /* Soft drop shadow */
+        .game-wrapper {
             display: flex;
-            flex-direction: column;
-            overflow: hidden;
+            width: 100%;
+            max-width: 1100px;
+            height: 750px;
+            gap: 20px;
             margin: 20px;
         }
 
-        .chat-header {
-            padding: 18px 24px;
+        /* Dashboard Sidebar styling */
+        .dashboard-sidebar {
+            width: 320px;
             background-color: var(--ncsu-white);
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .sidebar-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--ncsu-black);
+            border-bottom: 2px solid var(--chat-bg);
+            padding-bottom: 10px;
+        }
+
+        .metric-card {
+            padding: 14px 18px;
+            border-radius: 16px;
+            background-color: var(--chat-bg);
+            border-left: 5px solid #ccc;
+            transition: all 0.3s ease;
+        }
+
+        .metric-card.brain { border-left-color: var(--brain-color); }
+        .metric-card.heart { border-left-color: var(--heart-color); }
+        .metric-card.voice { border-left-color: var(--voice-color); }
+        .metric-card.reality { border-left-color: var(--reality-color); }
+
+        .metric-meta { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.85rem; font-weight: 600; color: #555; }
+        .metric-value { font-size: 1.3rem; font-weight: 800; color: var(--ncsu-black); }
+
+        /* Main Chat Area */
+        .chat-container {
+            flex: 1;
+            background-color: var(--ncsu-white);
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            padding: 20px 24px;
             border-bottom: 1px solid var(--border-color);
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 12px;
         }
 
-        .chat-header .logo-container {
+        .game-title h1 { font-size: 1.3rem; font-weight: 800; color: var(--ncsu-black); }
+        .game-title p { font-size: 0.85rem; color: #666; margin-top: 2px; }
+
+        .round-banner {
+            background-color: var(--chat-bg);
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--ncsu-red);
+        }
+
+        .active-role-indicator {
+            padding: 12px 24px;
+            background-color: #FFF5F5;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.9rem;
+            font-weight: 600;
             display: flex;
             align-items: center;
-            justify-content: center;
-            background-color: var(--ncsu-red);
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
-        }
-
-        .chat-header h1 {
-            font-size: 1.25rem;
-            color: var(--ncsu-black);
-            font-weight: 700;
-            letter-spacing: -0.3px;
+            gap: 10px;
         }
 
         .chat-messages {
@@ -79,246 +126,331 @@
             gap: 18px;
         }
 
-        .message-wrapper {
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            max-width: 85%;
-        }
+        .message-wrapper { display: flex; gap: 12px; max-width: 85%; }
+        .message-wrapper.ai { align-self: flex-start; }
+        .message-wrapper.user { align-self: flex-end; flex-direction: row-reverse; }
 
-        .message-wrapper.ai {
-            align-self: flex-start;
-        }
-
-        .message-wrapper.user {
-            align-self: flex-end;
-            flex-direction: row-reverse;
-        }
-
-        /* Local SVG Avatar styling */
         .avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: var(--ncsu-white);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
+            width: 34px; height: 34px; border-radius: 50%;
+            background: var(--ncsu-white); display: flex;
+            align-items: center; justify-content: center; flex-shrink: 0;
             box-shadow: 0 2px 6px rgba(0,0,0,0.05);
         }
 
-        .message {
-            padding: 12px 18px;
-            border-radius: 18px; /* Smooth bubble borders */
-            line-height: 1.5;
-            font-size: 0.95rem;
-        }
-
-        .message-wrapper.ai .message {
-            background-color: var(--ai-bubble);
-            color: var(--ncsu-black);
-            border-top-left-radius: 4px; /* Sleek asymmetric corner */
-        }
-
-        .message-wrapper.user .message {
-            background-color: var(--user-bubble);
-            color: var(--ncsu-white);
-            border-top-right-radius: 4px; /* Sleek asymmetric corner */
-        }
+        .message { padding: 14px 20px; border-radius: 18px; line-height: 1.5; font-size: 0.95rem; }
+        .message-wrapper.ai .message { background-color: var(--ncsu-white); color: var(--ncsu-black); border-top-left-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .message-wrapper.user .message { background-color: var(--ncsu-red); color: var(--ncsu-white); border-top-right-radius: 4px; }
 
         .chat-input-area {
-            padding: 16px 20px;
-            background-color: var(--ncsu-white);
+            padding: 18px 24px;
             border-top: 1px solid var(--border-color);
             display: flex;
-            align-items: center;
             gap: 12px;
         }
 
         #user-input {
-            flex: 1;
-            padding: 14px 20px;
-            border: 1px solid var(--border-color);
-            background-color: var(--chat-bg);
-            border-radius: 26px; /* Pill input shape */
-            outline: none;
-            font-size: 0.95rem;
-            transition: all 0.2s ease;
+            flex: 1; padding: 14px 20px; border: 1px solid var(--border-color);
+            background-color: var(--chat-bg); border-radius: 26px; outline: none;
+            font-size: 0.95rem; transition: all 0.2s ease;
         }
+        #user-input:focus { border-color: var(--ncsu-red); background-color: var(--ncsu-white); }
 
-        #user-input:focus {
-            border-color: var(--ncsu-red);
-            background-color: var(--ncsu-white);
-            box-shadow: 0 0 0 3px rgba(204, 0, 0, 0.1);
+        button {
+            background-color: var(--ncsu-red); color: var(--ncsu-white);
+            border: none; padding: 12px 28px; border-radius: 26px;
+            font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: all 0.2s;
         }
+        button:hover { background-color: #A30000; }
+        button:disabled { background-color: #CCC; cursor: not-allowed; }
 
-        #send-btn {
-            background-color: var(--ncsu-red);
-            color: var(--ncsu-white);
-            border: none;
-            padding: 12px 24px;
-            border-radius: 26px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s ease;
+        /* Scoreboard Table Modal overlay styles */
+        .scoreboard-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(244,245,248,0.98); display: flex;
+            flex-direction: column; align-items: center; justify-content: center;
+            padding: 40px; z-index: 10;
         }
+        .score-table { width: 100%; max-width: 600px; border-collapse: collapse; margin: 20px 0; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .score-table th, .score-table td { padding: 14px 20px; text-align: left; border-bottom: 1px solid var(--border-color); }
+        .score-table th { background: var(--ncsu-black); color: white; }
 
-        #send-btn:hover {
-            background-color: #A30000;
-        }
-
-        /* --- Gemini Markdown Style Support --- */
+        /* Markdown text layout definitions */
         .message strong { font-weight: 700; }
-        .message em { font-style: italic; }
-        .message code { background: rgba(0,0,0,0.06); padding: 2px 5px; border-radius: 4px; font-family: monospace; font-size: 0.85em; }
-        .message-wrapper.user .message code { background: rgba(255,255,255,0.2); }
-        .message ul, .message ol { padding-left: 20px; margin: 8px 0; }
+        .message ul { padding-left: 20px; margin: 8px 0; }
         .message li { margin-bottom: 4px; }
-        .message h1, .message h2, .message h3 { font-size: 1.1rem; margin: 10px 0 6px 0; font-weight: 700; }
-        .message p { margin-bottom: 6px; }
-        .message p:last-child { margin-bottom: 0; }
+        .message h3 { font-size: 1.05rem; margin: 12px 0 6px 0; }
     </style>
 </head>
 <body>
 
-    <div class="chat-container">
-        <header class="chat-header">
-            <div class="logo-container">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="square">
-                    <path d="M19 7H7.5A2.5 2.5 0 0 0 5 9.5v0A2.5 2.5 0 0 0 7.5 12H16.5a2.5 2.5 0 0 1 2.5 2.5v0a2.5 2.5 0 0 1 -2.5 2.5H5" />
-                </svg>
+    <div class="game-wrapper">
+        <aside class="dashboard-sidebar">
+            <div class="sidebar-title">Alex's Active Profile</div>
+            <div class="metric-card brain">
+                <div class="metric-meta"><span>Academic Power</span><span>The Brain</span></div>
+                <div class="metric-value" id="m-brain">50</div>
             </div>
-            <h1>Wolfpack AI Chat</h1>
-        </header>
+            <div class="metric-card heart">
+                <div class="metric-meta"><span>Impact & Passion</span><span>The Heart</span></div>
+                <div class="metric-value" id="m-heart">50</div>
+            </div>
+            <div class="metric-card voice">
+                <div class="metric-meta"><span>Unique Story Score</span><span>The Voice</span></div>
+                <div class="metric-value" id="m-voice">50</div>
+            </div>
+            <div class="metric-card reality">
+                <div class="metric-meta"><span>Mental Health / Budget</span><span>Reality Check</span></div>
+                <div class="metric-value" id="m-reality">50</div>
+            </div>
+        </aside>
 
-        <div class="chat-messages" id="chat-window">
-            <div class="message-wrapper ai">
-                <div class="avatar">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#CC0000" stroke-width="2">
-                        <path d="M12 2a5 5 0 0 1 5 5v2a5 5 0 0 1-10 0V7a5 5 0 0 1 5-5zM21 21v-2a4 4 0 0 0-3-3.87M3 21v-2a4 4 0 0 1 3-3.87M16 19a4 4 0 0 1-8 0"/>
-                    </svg>
+        <main class="chat-container" style="position: relative;">
+            <header class="chat-header">
+                <div class="game-title">
+                    <h1>Inside Alex's Brain</h1>
+                    <p id="act-indicator">Simulation Lobby</p>
                 </div>
-                <div class="message">
-                    <p>Go Pack! 🐺 How can I help you today? Ask me anything.</p>
+                <div class="round-banner" id="round-indicator">Pre-Game</div>
+            </header>
+
+            <div class="active-role-indicator" id="role-banner" style="display: none;">
+                </div>
+
+            <div class="chat-messages" id="chat-window">
+                <div class="message-wrapper ai">
+                    <div class="avatar">🐺</div>
+                    <div class="message">
+                        <h3>Welcome to the Admissions Lifecycle Simulator</h3>
+                        <p style="margin-top: 6px;">Your team represents different parts of Alex's consciousness balancing their profile. Click below to begin your 8-round lifecycle journey.</p>
+                        <button id="start-game-btn" style="margin-top: 14px;">Start Simulation Game</button>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="chat-input-area">
-            <input type="text" id="user-input" placeholder="Message Wolfpack AI..." autocomplete="off">
-            <button id="send-btn">Send</button>
-        </div>
+            <div class="chat-input-area">
+                <input type="text" id="user-input" placeholder="Awaiting game initialization..." disabled autocomplete="off">
+                <button id="send-btn" disabled>Send Decision</button>
+            </div>
+
+            <div id="scoreboard-anchor"></div>
+        </main>
     </div>
 
-    <script>
+    <script type="module">
+        import { GAME_ROLES, GAME_ROUNDS, INITIAL_SYSTEM_PROMPT } from './gameConfig.js';
+
+        // Current Simulation State Matrix
+        let currentRoundIndex = 0;
+        let scores = { BRAIN: 50, HEART: 50, VOICE: 50, REALITY: 50 };
+        let conversationLog = [];
+
         const chatWindow = document.getElementById('chat-window');
         const userInput = document.getElementById('user-input');
         const sendBtn = document.getElementById('send-btn');
+        const startGameBtn = document.getElementById('start-game-btn');
+        const roundIndicator = document.getElementById('round-indicator');
+        const actIndicator = document.getElementById('act-indicator');
+        const roleBanner = document.getElementById('role-banner');
 
-        // Text parsing framework engine to securely resolve Markdown notation flags from Gemini
-        function renderMarkdown(text) {
-            let html = text
-                .replace(/^### (.*$)/gim, '<h3>$1</h3>')
-                .replace(/^## (.*$)/gim, '<h2>$1</h2>')
-                .replace(/^# (.*$)/gim, '<h1>$1</h1>')
-                .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
-                .replace(/\*(.*?)\*/gim, '<em>$1</em>')
-                .replace(/`(.*?)`/gim, '<code>$1</code>');
+        // Document Object Hook Observers
+        startGameBtn.addEventListener('click', beginGameSequence);
+        sendBtn.addEventListener('click', processRoundSubmission);
+        userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') processRoundSubmission(); });
 
-            // Formulate array matrices blocks for standard lists
-            const lines = html.split('\n');
-            let inList = false;
-            
-            for (let i = 0; i < lines.length; i++) {
-                if (lines[i].trim().startsWith('* ')) {
-                    lines[i] = lines[i].replace('* ', '<li>') + '</li>';
-                    if (!inList) {
-                        lines[i] = '<ul>' + lines[i];
-                        inList = true;
-                    }
-                } else if (inList) {
-                    lines[i] = '</ul>' + lines[i];
-                    inList = false;
-                }
-            }
-            if (inList) lines[lines.length - 1] += '</ul>';
-            
-            return lines.join('\n').replace(/\n/g, '<br>');
+        function updateDashboardUI() {
+            document.getElementById('m-brain').textContent = scores.BRAIN;
+            document.getElementById('m-heart').textContent = scores.HEART;
+            document.getElementById('m-voice').textContent = scores.VOICE;
+            document.getElementById('m-reality').textContent = scores.REALITY;
         }
 
-        function appendMessage(text, sender) {
+        function renderMarkdown(text) {
+            return text
+                .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+                .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/gim, '<em>$1</em>')
+                .replace(/\n/g, '<br>');
+        }
+
+        function appendMessage(text, sender, customizedIcon = "🐺") {
             const wrapper = document.createElement('div');
             wrapper.classList.add('message-wrapper', sender);
 
-            // Append appropriate local Vector Graphic markup blocks depending on engine node routing
             const avatar = document.createElement('div');
             avatar.classList.add('avatar');
-            if (sender === 'ai') {
-                avatar.innerHTML = `
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#CC0000" stroke-width="2">
-                        <path d="M12 2a5 5 0 0 1 5 5v2a5 5 0 0 1-10 0V7a5 5 0 0 1 5-5zM21 21v-2a4 4 0 0 0-3-3.87M3 21v-2a4 4 0 0 1 3-3.87M16 19a4 4 0 0 1-8 0"/>
-                    </svg>`;
-            } else {
-                avatar.innerHTML = `
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#666666" stroke-width="2">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/>
-                    </svg>`;
-            }
+            avatar.innerHTML = sender === 'ai' ? customizedIcon : "👤";
 
-            const messageDiv = document.createElement('div');
-            messageDiv.classList.add('message');
-
-            if (sender === 'ai') {
-                messageDiv.innerHTML = renderMarkdown(text);
-            } else {
-                messageDiv.textContent = text;
-            }
+            const msgDiv = document.createElement('div');
+            msgDiv.classList.add('message');
+            msgDiv.innerHTML = sender === 'ai' ? renderMarkdown(text) : text;
 
             wrapper.appendChild(avatar);
-            wrapper.appendChild(messageDiv);
+            wrapper.appendChild(msgDiv);
             chatWindow.appendChild(wrapper);
             chatWindow.scrollTop = chatWindow.scrollHeight;
-            return messageDiv;
         }
 
-        async function sendMessage() {
-            const prompt = userInput.value.trim();
-            if (!prompt) return;
+        function beginGameSequence() {
+            startGameBtn.disabled = true;
+            userInput.disabled = false;
+            sendBtn.disabled = false;
+            userInput.placeholder = "Enter your strategy choice...";
+            
+            // Prime our structural API log array with the foundational configuration blueprint
+            conversationLog.push({ role: "user", content: INITIAL_SYSTEM_PROMPT });
+            loadRound(0);
+        }
 
-            appendMessage(prompt, 'user');
-            userInput.value = '';
+        function loadRound(index) {
+            if (index >= GAME_ROUNDS.length) {
+                renderEndgameScoreboard();
+                return;
+            }
 
-            const thinkingBubble = appendMessage("Thinking...", 'ai');
+            currentRoundIndex = index;
+            const roundData = GAME_ROUNDS[index];
+
+            // Render Dynamic Interface Banners
+            roundIndicator.textContent = `Round ${roundData.round} / 8`;
+            actIndicator.textContent = roundData.act;
+
+            // Setup Active Typing Role Configuration Viewports
+            if (roundData.role === "TEAM") {
+                roleBanner.style.display = "flex";
+                roleBanner.style.backgroundColor = "#F7FAFC";
+                roleBanner.style.color = "#000000";
+                roleBanner.innerHTML = `<strong>Active Typist:</strong> All Roles / Co-op Team Round!`;
+            } else {
+                const roleMeta = GAME_ROLES[roundData.role];
+                roleBanner.style.display = "flex";
+                roleBanner.style.backgroundColor = `${roleMeta.color}15`;
+                roleBanner.style.color = roleMeta.color;
+                roleBanner.innerHTML = `${roleMeta.icon} <span style="margin-left: 8px;"><strong>Active Typist:</strong> ${roleMeta.name}</span>`;
+            }
+
+            // Present the scenario context directly into the interaction log window
+            const scenarioContextText = `<strong>Scenario:</strong> ${roundData.scenario}<br><br><strong>Your Goal:</strong> ${roundData.goal}`;
+            appendMessage(scenarioContextText, "ai", "📋");
+        }
+
+        async function processRoundSubmission() {
+            const promptValue = userInput.value.trim();
+            if (!promptValue) return;
+
+            appendMessage(promptValue, "user");
+            userInput.value = "";
+            userInput.disabled = true;
+            sendBtn.disabled = true;
+
+            // Pack the request block frame arrays together for delivery transmission pathing
+            const roundData = GAME_ROUNDS[currentRoundIndex];
+            const systemContextualizedPrompt = `[ROUND ${roundData.round} EVALUATION - ROLE: ${roundData.role}]\nStudent Decision Input: ${promptValue}`;
+            conversationLog.push({ role: "user", content: systemContextualizedPrompt });
+
+            appendMessage("Evaluating choice parameters...", "ai", "⏳");
+            const processingBubble = chatWindow.lastChild.querySelector('.message');
 
             try {
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt: prompt })
+                    body: JSON.stringify({ prompt: JSON.stringify(conversationLog) })
                 });
 
                 const data = await response.json();
 
                 if (response.ok) {
-                    thinkingBubble.innerHTML = renderMarkdown(data.text);
-                } else {
-                    thinkingBubble.textContent = `Error: ${data.error}`;
-                    thinkingBubble.style.color = '#CC0000';
-                }
+                    processingBubble.innerHTML = renderMarkdown(data.text);
+                    conversationLog.push({ role: "model", content: data.text });
+                    
+                    // Parse data parameters returned out from system blocks safely
+                    extractMetricAdjustments(data.text);
+                    updateDashboardUI();
 
-            } catch (error) {
-                thinkingBubble.textContent = "Fatal Connection Error.";
-                thinkingBubble.style.color = '#CC0000';
-                console.error("Fetch error:", error);
+                    // Advance system lifecycle indexing path forward
+                    setTimeout(() => {
+                        loadRound(currentRoundIndex + 1);
+                        userInput.disabled = false;
+                        sendBtn.disabled = false;
+                    }, 1000);
+
+                } else {
+                    processingBubble.textContent = `Error: ${data.error}`;
+                }
+            } catch (err) {
+                processingBubble.textContent = "Fatal Connection Timeout connecting to server engine loop.";
+                console.error(err);
             }
         }
 
-        sendBtn.addEventListener('click', sendMessage);
-        userInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') sendMessage();
-        });
+        function extractMetricAdjustments(rawText) {
+            // Evaluates text streams dynamically looking for standard execution metric output tags
+            const regexes = {
+                BRAIN: /\[ACADEMIC_POWER:\s*([+-]\d+)\]/i,
+                HEART: /\[IMPACT_PASSION:\s*([+-]\d+)\]/i,
+                VOICE: /\[UNIQUE_STORY:\s*([+-]\d+)\]/i,
+                REALITY: /\[MENTAL_HEALTH_BUDGET:\s*([+-]\d+)\]/i
+            };
+
+            for (const key in regexes) {
+                const match = rawText.match(regexes[key]);
+                if (match) {
+                    const adjustment = parseInt(match[1], 10);
+                    scores[key] = Math.min(100, Math.max(0, scores[key] + adjustment));
+                }
+            }
+        }
+
+        function renderEndgameScoreboard() {
+            userInput.disabled = true;
+            sendBtn.disabled = true;
+            roleBanner.style.display = "none";
+            
+            // Calculate macro summary calculations
+            const finalAverage = Math.round((scores.BRAIN + scores.HEART + scores.VOICE + scores.REALITY) / 4);
+            
+            let archetype = "";
+            let description = "";
+
+            if (finalAverage >= 85) {
+                archetype = "The Balanced Scholar";
+                description = "Alex got into an incredible university, kept their mental health pristine, avoided predatory debt, and built a deeply compelling personal story.";
+            } else if (finalAverage >= 70) {
+                archetype = "The Safe Bet";
+                description = "Alex navigated the system successfully. They made safe choices, though they left some potential on the table by playing it a bit too cautious in their essays or activities.";
+            } else if (finalAverage >= 50) {
+                archetype = "The Burnout";
+                description = "Alex prioritized brand name and numbers over human strategy. They survived the cycle, but entered college highly stressed, exhausted, or burdened with unnecessary debt.";
+            } else {
+                archetype = "The Resume Robot";
+                description = "Alex built a completely artificial profile based on what they thought colleges wanted to see, completely losing their authentic voice and failing to match with their ideal target institutions.";
+            }
+
+            const scoreboardAnchor = document.getElementById('scoreboard-anchor');
+            scoreboardAnchor.innerHTML = `
+                <div class="scoreboard-layer">
+                    <h2 style="font-size: 2rem; color: var(--ncsu-red); font-weight:800;">Simulation Complete!</h2>
+                    <p style="margin: 8px 0 24px 0; font-size: 1.1rem; text-align: center;">Alex's profile has finalized. Here are the tracking results:</p>
+                    
+                    <table class="score-table">
+                        <thead><tr><th>Metric Tracker Profile</th><th>Final Score</th></tr></thead>
+                        <tbody>
+                            <tr><td>Academic Power (The Brain)</td><td><strong>${scores.BRAIN} / 100</strong></td></tr>
+                            <tr><td>Impact & Passion (The Heart)</td><td><strong>${scores.HEART} / 100</strong></td></tr>
+                            <tr><td>Unique Story Score (The Voice)</td><td><strong>${scores.VOICE} / 100</strong></td></tr>
+                            <tr><td>Mental Health & Budget (Reality Check)</td><td><strong>${scores.REALITY} / 100</strong></td></tr>
+                            <tr style="background: #F7FAFC; font-size: 1.1rem; color: var(--ncsu-red);">
+                                <td><strong>Overall Metric Synergy Average</strong></td><td><strong>${finalAverage} / 100</strong></td></tr>
+                        </tbody>
+                    </table>
+
+                    <div style="background: white; padding: 24px; border-radius:16px; border: 2px solid var(--ncsu-red); max-width:600px; text-align:center; box-shadow: 0 4px 12px rgba(0,0,0,0.05)">
+                        <h3 style="font-size: 1.3rem; margin-bottom: 8px;">Final Archetype: ${archetype}</h3>
+                        <p style="color: #4A5568; line-height:1.5;">${description}</p>
+                    </div>
+                </div>
+            `;
+        }
     </script>
 </body>
 </html>
