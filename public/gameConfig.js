@@ -28,11 +28,11 @@ export const GAME_ROLES = {
 };
 
 export const INITIAL_SYSTEM_PROMPT = `
-You are the strict, unforgiving Game Master for the high-stakes college admissions simulator "Inside Alex's Brain". 
-Your core directives are:
-1. Act as a harsh critic. If a team submits a generic, lazy, or unrealistic strategy, penalize their metrics heavily. Reward them ONLY for hyper-specific, clever, and grounded tactical maneuvers.
-2. Provide a blunt, fast-paced narrative outcome (max 3 sentences) detailing the immediate real-world consequences of their choice.
-3. You MUST conclude every response with the exact bracketed metric format below. Do not omit any tracker. Every round must cause shifts between -20 and +20 based on your strict evaluation.
+You are the expert college admissions counselor and Game Master for the student lifecycle simulator "Inside Alex's Brain".
+Your core directives:
+1. Evaluate the user's strategic choices using realistic, real-world admissions criteria. Be balanced, not overly harsh or overly lenient.
+2. Provide immediate constructive feedback (3-4 sentences). Explain WHY their decision helps or hurts Alex from a modern admissions perspective, and what realistic trade-offs occurred.
+3. Conclude every response with the exact bracketed metric format below. Every round must cause shifts between -15 and +15 based on your professional evaluation.
 
 Format to output at the very end of your response:
 ### Metric Ledger
@@ -42,61 +42,70 @@ Format to output at the very end of your response:
 [MENTAL_HEALTH_BUDGET: +/- X]
 `;
 
+export const REPORT_GENERATION_PROMPT = `
+You are an expert college admissions consultant analyzing Alex's complete 8-round lifecycle journey. 
+Review the entire conversation history above. Write a highly constructive, personalized "Admissions Advisory Blueprint" for the student team.
+Provide:
+1. An executive analysis of their strategy (What themes did they emphasize? Where did they balance well?).
+2. 3-4 highly specific, actionable, real-world recommendations that a real high school student should implement to avoid the traps Alex encountered or replicate their successes.
+Format the output cleanly using Markdown headers (###) and bullet points. Keep the tone encouraging, educational, and professional.
+`;
+
 export const GAME_ROUNDS = [
     {
         round: 1,
         act: "ACT I: THE SETUP (Junior Spring - Summer)",
         role: "BRAIN",
         scenario: "It is May of Junior Year. Standardized testing is back with a vengeance. Alex takes a surprise diagnostic SAT and scores in the bottom 30th percentile for their dream targets. The absolute last official test date before early deadlines is June—the exact same week as Alex's brutal, high-stakes AP final exams. To make things worse, Alex's parents just signed them up for a grueling 6-hour daily boot camp that overlaps with final review sessions. If Alex crashes, their pristine GPA permanently plummets; if they bail on the test, their dream schools are mathematically out of reach.",
-        goal: "Formulate a flawless, hour-by-hour triage plan for test prep and final exam tracking that keeps the GPA from exploding."
+        goal: "Formulate a balanced plan for test prep and final exam tracking that keeps the GPA from exploding."
     },
     {
         round: 2,
         act: "ACT I: THE SETUP",
         role: "HEART",
         scenario: "It is July. Alex's activities sheet is completely blank. In a panic, Alex's peers are paying $3,000 for a predatory 'Pre-College Elite Leadership Academy' on an Ivy League campus to buy an admissions edge. Alex's family absolutely cannot afford this and considers a high-interest loan. Peer pressure is causing Alex to spiral, feeling completely inadequate and left behind. Admissions officers see right through these pay-to-play camps.",
-        goal: "Ditch the fake camp. Pitch a completely free, rebellious, or highly unconventional local initiative from scratch that generates undeniable human impact."
+        goal: "Ditch the fake camp. Pitch a completely free, authentic local initiative from scratch that generates undeniable human impact."
     },
     {
         round: 3,
         act: "ACT I: THE SETUP",
         role: "REALITY",
         scenario: "Late August arrives, and the Common App portal opens. Consumed by toxic prestige-chasing on social media, Alex demands to apply to 18 different Ivy+ and Top-20 institutions simultaneously. This insane list will trigger over $1,500 in application fees, require managing a nightmare matrix of logins, and demand writing 55 custom supplemental essays. Alex's childhood friend warns that this is a fast track to complete mental collapse before Halloween.",
-        goal: "Enforce aggressive, executive boundaries. Slash and burn this chaotic list into a logical, razor-sharp portfolio of Reaches, Targets, and Safeties."
+        goal: "Enforce logical boundaries. Trim this chaotic list into a logical, razor-sharp portfolio of Reaches, Targets, and Safeties."
     },
     {
         round: 4,
         act: "ACT II: THE GRIND (Senior Fall)",
         role: "VOICE",
         scenario: "October crunch time. Alex panics over their personal statement, picks a generic 'sports injury' cliché, and runs it through an aggressive AI polisher to make it sound 'smart'. The result is an unreadable, robotic nightmare packed with corporate buzzwords like 'I synthesized my synergistic paradigm for passion'. It possesses zero human vulnerability. To make matters worse, Alex accidentally hits 'save' over their original rough draft, destroying their initial authentic thoughts.",
-        goal: "Dismantle this corporate AI disaster. Dictate an emergency tactical prompt or strategy to extract a raw, deeply human, slice-of-life essay tone out of thin air."
+        goal: "Dismantle this corporate AI disaster. Dictate an emergency tactical plan to extract a raw, deeply human, slice-of-life essay tone."
     },
     {
         round: 5,
         act: "ACT II: THE GRIND",
         role: "REALITY",
         scenario: "It is October 30th, 48 hours before the binding Early Decision deadline. Alex is completely infatuated with an elite, out-of-state dream school where ED status more than doubles the statistical acceptance rate. However, the net price calculator reveals a devastating truth: if Alex is accepted under this binding contract, the family will be legally locked into paying full price, completely blinding them to aid packages from other schools. Alex's parents are quiet, secretly planning to liquidate their modest retirement funds.",
-        goal: "Make the final executive, ethical call. Pull the high-stakes trigger on binding ED, or protect family assets by pivoting to non-binding Early Action (EA) options."
+        goal: "Make the final executive, ethical call. Pull the high-stakes trigger on binding ED, or protect family assets by utilizing non-binding Early Action (EA) options."
     },
     {
         round: 6,
         act: "ACT II: THE GRIND",
         role: "BRAIN",
         scenario: "December arrives, and Regular Decision deadlines are two weeks away. The AP Chemistry teacher who promised a critical recommendation letter has suddenly ghosted, stopped answering emails, and gone on an unannounced leave of absence. Simultaneously, Alex's mid-year senior grades are slipping from an A to a C due to absolute burnout. If that letter stays missing, the apps are automatically disqualified; if that grade drop hits the mid-year report, it triggers an immediate admissions red flag.",
-        goal: "Draft a high-leverage emergency plan to corner school administration, lock down a backup recommender, and aggressively save the collapsing grade."
+        goal: "Draft a high-leverage emergency plan to corner school administration, lock down a backup recommender, and save the collapsing grade."
     },
     {
         round: 7,
         act: "ACT III: THE VERDICT (Senior Spring)",
         role: "HEART",
         scenario: "Late March decision day. Notifications drop all at once. Alex gets rejected by their top choices and placed on a brutal Waitlist at their favorite target university. Alex completely collapses on the floor, feels entirely defeated, and wants to delete their portals and give up entirely. The target school's waitlist is active, but historic data shows they only accept students who send an elite, undeniable counter-update.",
-        goal: "Shake off the despair. Design a calculated, aggressive Letter of Continued Interest (LOCI) that leverages a recent hidden achievement to turn the waitlist into an active win."
+        goal: "Shake off the despair. Design a calculated Letter of Continued Interest (LOCI) that leverages a recent hidden achievement to turn the waitlist into a win."
     },
     {
         round: 8,
         act: "ACT III: THE VERDICT",
         role: "TEAM",
         scenario: "Mid-April. The waitlist counter-strategy miraculously worked, and Alex is accepted to their dream out-of-state university—but with $0 financial aid, forcing a soul-crushing $90,000 in student loan debt. Concurrently, Alex has a full-ride merit scholarship ($0 debt) to the in-state flagship's prestigious Honors Program. Alex's peers are bragging about elite brands on social media, putting immense psychological pressure on the choice. Prestige means potential debt slavery; safety means giving up the elite dream brand.",
-        goal: "Bring all parts of the brain together. Write the final directive committing Alex to their path, defending how this choice manages prestige, mental freedom, and debt safety."
+        goal: "Bring all roles together. Write the final directive committing Alex to their path, defending how this choice manages prestige, mental freedom, and debt safety."
     }
 ];

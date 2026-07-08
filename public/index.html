@@ -1,3 +1,4 @@
+<!-- public/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -38,7 +39,6 @@
             margin: 20px;
         }
 
-        /* Dashboard Sidebar styling */
         .dashboard-sidebar {
             width: 320px;
             background-color: var(--ncsu-white);
@@ -74,7 +74,6 @@
         .metric-meta { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.85rem; font-weight: 600; color: #555; }
         .metric-value { font-size: 1.3rem; font-weight: 800; color: var(--ncsu-black); }
 
-        /* Main Chat Area */
         .chat-container {
             flex: 1;
             background-color: var(--ncsu-white);
@@ -163,22 +162,28 @@
         button:hover { background-color: #A30000; }
         button:disabled { background-color: #CCC; cursor: not-allowed; }
 
-        /* Scoreboard Table Modal overlay styles */
         .scoreboard-layer {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(244,245,248,0.98); display: flex;
-            flex-direction: column; align-items: center; justify-content: center;
-            padding: 40px; z-index: 10;
+            flex-direction: column; align-items: center;
+            padding: 40px; z-index: 10; overflow-y: auto;
         }
         .score-table { width: 100%; max-width: 600px; border-collapse: collapse; margin: 20px 0; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .score-table th, .score-table td { padding: 14px 20px; text-align: left; border-bottom: 1px solid var(--border-color); }
         .score-table th { background: var(--ncsu-black); color: white; }
 
-        /* Markdown text layout definitions */
         .message strong { font-weight: 700; }
         .message ul { padding-left: 20px; margin: 8px 0; }
         .message li { margin-bottom: 4px; }
         .message h3 { font-size: 1.05rem; margin: 12px 0 6px 0; }
+        
+        .report-box {
+            background: white; padding: 24px; border-radius: 16px; border: 1px solid var(--border-color);
+            max-width: 600px; text-align: left; box-shadow: 0 4px 12px rgba(0,0,0,0.02); margin-top: 20px; width: 100%;
+        }
+        .report-box h3 { margin-bottom: 10px; color: var(--ncsu-red); }
+        .report-box ul { padding-left: 20px; margin: 10px 0; }
+        .report-box li { margin-bottom: 6px; line-height: 1.5; font-size: 0.95rem; }
     </style>
 </head>
 <body>
@@ -213,8 +218,7 @@
                 <div class="round-banner" id="round-indicator">Pre-Game</div>
             </header>
 
-            <div class="active-role-indicator" id="role-banner" style="display: none;">
-                </div>
+            <div class="active-role-indicator" id="role-banner" style="display: none;"></div>
 
             <div class="chat-messages" id="chat-window">
                 <div class="message-wrapper ai">
@@ -237,9 +241,8 @@
     </div>
 
     <script type="module">
-        import { GAME_ROLES, GAME_ROUNDS, INITIAL_SYSTEM_PROMPT } from './gameConfig.js';
+        import { GAME_ROLES, GAME_ROUNDS, INITIAL_SYSTEM_PROMPT, REPORT_GENERATION_PROMPT } from './gameConfig.js';
 
-        // Current Simulation State Matrix
         let currentRoundIndex = 0;
         let scores = { BRAIN: 50, HEART: 50, VOICE: 50, REALITY: 50 };
         let conversationLog = [];
@@ -252,7 +255,6 @@
         const actIndicator = document.getElementById('act-indicator');
         const roleBanner = document.getElementById('role-banner');
 
-        // Document Object Hook Observers
         startGameBtn.addEventListener('click', beginGameSequence);
         sendBtn.addEventListener('click', processRoundSubmission);
         userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') processRoundSubmission(); });
@@ -295,8 +297,6 @@
             userInput.disabled = false;
             sendBtn.disabled = false;
             userInput.placeholder = "Enter your strategy choice...";
-            
-            // Prime our structural API log array with the foundational configuration blueprint
             conversationLog.push({ role: "user", content: INITIAL_SYSTEM_PROMPT });
             loadRound(0);
         }
@@ -310,15 +310,13 @@
             currentRoundIndex = index;
             const roundData = GAME_ROUNDS[index];
 
-            // Render Dynamic Interface Banners
             roundIndicator.textContent = `Round ${roundData.round} / 8`;
             actIndicator.textContent = roundData.act;
 
-            // Setup Active Typing Role Configuration Viewports
             if (roundData.role === "TEAM") {
                 roleBanner.style.display = "flex";
                 roleBanner.style.backgroundColor = "#F7FAFC";
-                roleBanner.style.color = "#000000";
+                roleBanner.style.color = "#111";
                 roleBanner.innerHTML = `<strong>Active Typist:</strong> All Roles / Co-op Team Round!`;
             } else {
                 const roleMeta = GAME_ROLES[roundData.role];
@@ -328,7 +326,6 @@
                 roleBanner.innerHTML = `${roleMeta.icon} <span style="margin-left: 8px;"><strong>Active Typist:</strong> ${roleMeta.name}</span>`;
             }
 
-            // Present the scenario context directly into the interaction log window
             const scenarioContextText = `<strong>Scenario:</strong> ${roundData.scenario}<br><br><strong>Your Goal:</strong> ${roundData.goal}`;
             appendMessage(scenarioContextText, "ai", "📋");
         }
@@ -342,7 +339,6 @@
             userInput.disabled = true;
             sendBtn.disabled = true;
 
-            // Pack the request block frame arrays together for delivery transmission pathing
             const roundData = GAME_ROUNDS[currentRoundIndex];
             const systemContextualizedPrompt = `[ROUND ${roundData.round} EVALUATION - ROLE: ${roundData.role}]\nStudent Decision Input: ${promptValue}`;
             conversationLog.push({ role: "user", content: systemContextualizedPrompt });
@@ -363,11 +359,9 @@
                     processingBubble.innerHTML = renderMarkdown(data.text);
                     conversationLog.push({ role: "model", content: data.text });
                     
-                    // Parse data parameters returned out from system blocks safely
                     extractMetricAdjustments(data.text);
                     updateDashboardUI();
 
-                    // Advance system lifecycle indexing path forward
                     setTimeout(() => {
                         loadRound(currentRoundIndex + 1);
                         userInput.disabled = false;
@@ -384,7 +378,6 @@
         }
 
         function extractMetricAdjustments(rawText) {
-            // Evaluates text streams dynamically looking for standard execution metric output tags
             const regexes = {
                 BRAIN: /\[ACADEMIC_POWER:\s*([+-]\d+)\]/i,
                 HEART: /\[IMPACT_PASSION:\s*([+-]\d+)\]/i,
@@ -406,31 +399,18 @@
             sendBtn.disabled = true;
             roleBanner.style.display = "none";
             
-            // Calculate macro summary calculations
             const finalAverage = Math.round((scores.BRAIN + scores.HEART + scores.VOICE + scores.REALITY) / 4);
-            
-            let archetype = "";
-            let description = "";
+            let archetype = "", description = "";
 
-            if (finalAverage >= 85) {
-                archetype = "The Balanced Scholar";
-                description = "Alex got into an incredible university, kept their mental health pristine, avoided predatory debt, and built a deeply compelling personal story.";
-            } else if (finalAverage >= 70) {
-                archetype = "The Safe Bet";
-                description = "Alex navigated the system successfully. They made safe choices, though they left some potential on the table by playing it a bit too cautious in their essays or activities.";
-            } else if (finalAverage >= 50) {
-                archetype = "The Burnout";
-                description = "Alex prioritized brand name and numbers over human strategy. They survived the cycle, but entered college highly stressed, exhausted, or burdened with unnecessary debt.";
-            } else {
-                archetype = "The Resume Robot";
-                description = "Alex built a completely artificial profile based on what they thought colleges wanted to see, completely losing their authentic voice and failing to match with their ideal target institutions.";
-            }
+            if (finalAverage >= 85) { archetype = "The Balanced Scholar"; description = "Alex got into an incredible university, kept their mental health pristine, avoided predatory debt, and built a deeply compelling personal story."; }
+            else if (finalAverage >= 70) { archetype = "The Safe Bet"; description = "Alex navigated the system successfully. They made safe choices, though they left some potential on the table by playing it a bit too cautious."; }
+            else if (finalAverage >= 50) { archetype = "The Burnout"; description = "Alex prioritized brand name and numbers over human strategy. They survived the cycle, but entered college highly stressed or burdened with debt."; }
+            else { archetype = "The Resume Robot"; description = "Alex built a completely artificial profile based on what they thought colleges wanted to see, completely losing their authentic voice."; }
 
             const scoreboardAnchor = document.getElementById('scoreboard-anchor');
             scoreboardAnchor.innerHTML = `
                 <div class="scoreboard-layer">
                     <h2 style="font-size: 2rem; color: var(--ncsu-red); font-weight:800;">Simulation Complete!</h2>
-                    <p style="margin: 8px 0 24px 0; font-size: 1.1rem; text-align: center;">Alex's profile has finalized. Here are the tracking results:</p>
                     
                     <table class="score-table">
                         <thead><tr><th>Metric Tracker Profile</th><th>Final Score</th></tr></thead>
@@ -439,17 +419,59 @@
                             <tr><td>Impact & Passion (The Heart)</td><td><strong>${scores.HEART} / 100</strong></td></tr>
                             <tr><td>Unique Story Score (The Voice)</td><td><strong>${scores.VOICE} / 100</strong></td></tr>
                             <tr><td>Mental Health & Budget (Reality Check)</td><td><strong>${scores.REALITY} / 100</strong></td></tr>
-                            <tr style="background: #F7FAFC; font-size: 1.1rem; color: var(--ncsu-red);">
-                                <td><strong>Overall Metric Synergy Average</strong></td><td><strong>${finalAverage} / 100</strong></td></tr>
+                            <tr style="background: #F7FAFC; color: var(--ncsu-red);"><td><strong>Overall Synergy Average</strong></td><td><strong>${finalAverage} / 100</strong></td></tr>
                         </tbody>
                     </table>
 
-                    <div style="background: white; padding: 24px; border-radius:16px; border: 2px solid var(--ncsu-red); max-width:600px; text-align:center; box-shadow: 0 4px 12px rgba(0,0,0,0.05)">
-                        <h3 style="font-size: 1.3rem; margin-bottom: 8px;">Final Archetype: ${archetype}</h3>
-                        <p style="color: #4A5568; line-height:1.5;">${description}</p>
+                    <div style="background: white; padding: 24px; border-radius:16px; border: 1px solid var(--border-color); max-width:600px; text-align:center; width:100%;">
+                        <h3 style="font-size: 1.2rem; margin-bottom: 8px;">Final Archetype: ${archetype}</h3>
+                        <p style="color: #4A5568; line-height:1.5; font-size:0.95rem;">${description}</p>
+                        <button id="generate-report-btn" style="margin-top:16px; width:100%;">Generate Counselor Blueprint Report</button>
+                    </div>
+                    
+                    <div id="report-output-box" class="report-box" style="display:none;">
+                        <h3>Admissions Advisory Blueprint</h3>
+                        <div id="report-text">Analyzing performance matrices...</div>
                     </div>
                 </div>
             `;
+
+            document.getElementById('generate-report-btn').addEventListener('click', fetchCounselorReport);
+        }
+
+        async function fetchCounselorReport() {
+            const rptBtn = document.getElementById('generate-report-btn');
+            const rptBox = document.getElementById('report-output-box');
+            const rptText = document.getElementById('report-text');
+
+            rptBtn.disabled = true;
+            rptBtn.textContent = "Compiling Analytics Report...";
+            rptBox.style.display = "block";
+
+            // Push the special analysis prompt into the session log tracking matrix
+            conversationLog.push({ role: "user", content: REPORT_GENERATION_PROMPT });
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: JSON.stringify(conversationLog) })
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    rptText.innerHTML = renderMarkdown(data.text);
+                    rptBtn.textContent = "Report Generated Successfully";
+                } else {
+                    rptText.textContent = `Error compiling details: ${data.error}`;
+                    rptBtn.disabled = false;
+                    rptBtn.textContent = "Retry Report Generation";
+                }
+            } catch (err) {
+                rptText.textContent = "Connection drop while communicating with analysis matrix engine.";
+                rptBtn.disabled = false;
+                rptBtn.textContent = "Retry Report Generation";
+            }
         }
     </script>
 </body>
