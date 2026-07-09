@@ -1,4 +1,3 @@
-<!-- public/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -49,6 +48,7 @@
             display: flex;
             flex-direction: column;
             gap: 16px;
+            flex-shrink: 0;
         }
 
         .sidebar-title {
@@ -203,12 +203,117 @@
         .report-box h3 { margin-bottom: 10px; color: var(--ncsu-red); }
         .report-box ul { padding-left: 20px; margin: 10px 0; }
         .report-box li { margin-bottom: 6px; line-height: 1.5; font-size: 0.95rem; }
+
+        /* ================= MOBILE OPTIMIZATION RESPONSIVE QUERIES ================= */
+        @media (max-width: 768px) {
+            body {
+                align-items: flex-start;
+                background-color: var(--chat-bg);
+            }
+
+            .game-wrapper {
+                flex-direction: column;
+                height: auto;
+                min-height: 100vh;
+                gap: 12px;
+                margin: 0;
+                padding: 12px;
+            }
+
+            /* Adjust Sidebar to sit horizontally as a score bar header */
+            .dashboard-sidebar {
+                width: 100%;
+                padding: 16px;
+                border-radius: 18px;
+                gap: 12px;
+            }
+
+            .sidebar-title {
+                display: none; /* Hide the title text to save dynamic viewport area */
+            }
+
+            /* Arrange metric cards into a responsive 2x2 side-by-side pattern */
+            .dashboard-sidebar {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                grid-template-areas: 
+                    "nav nav"
+                    "card1 card2"
+                    "card3 card4";
+            }
+
+            .tab-navigation-bar { grid-area: nav; margin-bottom: 4px; }
+            .metric-card.brain { grid-area: card1; }
+            .metric-card.heart { grid-area: card2; }
+            .metric-card.voice { grid-area: card3; }
+            .metric-card.reality { grid-area: card4; }
+
+            .metric-card {
+                padding: 10px 12px;
+                border-radius: 12px;
+            }
+
+            .metric-meta span:last-child {
+                display: none; /* Hide sublabels like 'The Brain' on mobile grids */
+            }
+
+            .metric-value {
+                font-size: 1.15rem;
+                margin-top: 2px;
+            }
+
+            /* Chat window container scales to match mobile touch heights */
+            .chat-container {
+                height: 520px; /* Lock height on mobile so content internal scroll handles function */
+                border-radius: 18px;
+            }
+
+            .chat-header {
+                padding: 14px 18px;
+            }
+
+            .game-title h1 { font-size: 1.1rem; }
+            .game-title p { font-size: 0.75rem; }
+            .round-banner { font-size: 0.75rem; padding: 4px 10px; }
+
+            .chat-messages {
+                padding: 16px;
+                gap: 14px;
+            }
+
+            .message-wrapper { max-width: 90%; }
+            .message { padding: 12px 16px; font-size: 0.9rem; }
+            .avatar { width: 30px; height: 30px; font-size: 0.85rem; }
+
+            .chat-input-area {
+                padding: 12px 16px;
+                gap: 8px;
+            }
+
+            #user-input {
+                padding: 12px 16px;
+                font-size: 0.9rem;
+            }
+
+            button {
+                padding: 12px 20px;
+                font-size: 0.9rem;
+            }
+
+            .scoreboard-layer {
+                padding: 16px;
+            }
+            
+            .score-table th, .score-table td {
+                padding: 10px 12px;
+                font-size: 0.85rem;
+            }
+        }
     </style>
 </head>
 <body>
 
     <div class="game-wrapper">
-        <!-- Dual Mode Navigation & Trackers Sidebar -->
         <aside class="dashboard-sidebar">
             <nav class="tab-navigation-bar">
                 <button class="tab-btn active" id="tab-sim-btn">Class Simulation</button>
@@ -235,7 +340,6 @@
             </div>
         </aside>
 
-        <!-- Main Workspace Terminal Panel -->
         <main class="chat-container" style="position: relative;">
             <header class="chat-header">
                 <div class="game-title">
@@ -247,7 +351,6 @@
 
             <div class="active-role-indicator" id="role-banner" style="display: none;"></div>
 
-            <!-- Tab Panel Viewport 1: Classroom Simulation -->
             <div class="chat-messages active-view-panel" id="panel-sim-view">
                 <div class="message-wrapper ai">
                     <div class="avatar">🐺</div>
@@ -259,7 +362,6 @@
                 </div>
             </div>
 
-            <!-- Tab Panel Viewport 2: Personal Strategy Studio -->
             <div class="chat-messages" id="panel-personal-view">
                 <div class="message-wrapper ai">
                     <div class="avatar">🎓</div>
@@ -271,13 +373,11 @@
                 </div>
             </div>
 
-            <!-- Global Action Control Bar -->
             <div class="chat-input-area">
                 <input type="text" id="user-input" placeholder="Please select or start a workshop mode above..." disabled autocomplete="off">
                 <button id="send-btn" disabled>Submit Input</button>
             </div>
 
-            <!-- Mount targets for end state overlays -->
             <div id="sim-scoreboard-anchor"></div>
             <div id="personal-scoreboard-anchor"></div>
         </main>
@@ -383,47 +483,31 @@
         }
 
         function renderMarkdown(text) {
-    if (!text) return "";
+            if (!text) return "";
+            let html = text.replace(/\\n/g, '\n');
+            html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+            html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+            html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+            html = html.replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>');
+            html = html.replace(/\*(.*?)\*/gim, '<em>$1</em>');
 
-    // 1. Handle literal or double-escaped newlines safely first
-    let html = text.replace(/\\n/g, '\n');
+            let lines = html.split('\n');
+            let inList = false;
 
-    // 2. Parse Headers (#, ##, ###) while ensuring they sit at line boundaries
-    html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
-    html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
-    html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
-
-    // 3. Parse Bold (**text**) and Italics (*text*)
-    html = html.replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>');
-    html = html.replace(/\*(.*?)\*/gim, '<em>$1</em>');
-
-    // 4. Clean up lists/bullet points (* item) line by line
-    let lines = html.split('\n');
-    let inList = false;
-
-    for (let i = 0; i < lines.length; i++) {
-        let trimmed = lines[i].trim();
-        if (trimmed.startsWith('* ')) {
-            lines[i] = `<li>${trimmed.substring(2)}</li>`;
-            if (!inList) {
-                lines[i] = '<ul>' + lines[i];
-                inList = true;
+            for (let i = 0; i < lines.length; i++) {
+                let trimmed = lines[i].trim();
+                if (trimmed.startsWith('* ')) {
+                    lines[i] = `<li>${trimmed.substring(2)}</li>`;
+                    if (!inList) { lines[i] = '<ul>' + lines[i]; inList = true; }
+                } else if (inList && trimmed === '') {
+                    continue;
+                } else if (inList) {
+                    lines[i] = '</ul>' + lines[i]; inList = false;
+                }
             }
-        } else if (inList && trimmed === '') {
-            // Keep empty lines inside lists clean
-            continue;
-        } else if (inList) {
-            lines[i] = '</ul>' + lines[i];
-            inList = false;
+            if (inList) lines[lines.length - 1] += '</ul>';
+            return lines.join('\n').replace(/\n/g, '<br>');
         }
-    }
-    if (inList) {
-        lines[lines.length - 1] += '</ul>';
-    }
-
-    // 5. Join lines back and replace remaining individual structural newlines with clean line breaks
-    return lines.join('\n').replace(/\n/g, '<br>');
-}
 
         function appendTargetedMessage(panelId, text, sender, icon = "🐺") {
             const panel = document.getElementById(panelId);
@@ -490,7 +574,6 @@
             roleBanner.style.display = "flex"; roleBanner.style.backgroundColor = "#EBF8FF"; roleBanner.style.color = "#2B6CB0";
             roleBanner.innerHTML = `🎓 <span style="margin-left:8px;"><strong>Counselor Step:</strong> Exploring ${stageData.topic}</span>`;
             
-            // Only inject if message stream window panel workspace node is empty
             if (document.getElementById('panel-personal-view').children.length <= 1 + index * 2) {
                 appendTargetedMessage('panel-personal-view', stageData.prompt, "ai", "🎓");
             }
