@@ -43,12 +43,22 @@ Format to output at the very end:
 `;
 
 export const REPORT_GENERATION_PROMPT = `
-You are an expert college admissions consultant analyzing Alex's complete 8-round lifecycle journey. 
-Review the entire conversation history above. Write a highly constructive, personalized "Admissions Advisory Blueprint" for the student team.
-Provide:
-1. An executive analysis of their strategy (What themes did they emphasize? Where did they balance well?).
-2. 3-4 highly specific, actionable, real-world recommendations that a real high school student should implement to avoid the traps Alex encountered or replicate their successes.
-Format the output cleanly using Markdown headers (###) and bullet points. Keep the tone encouraging, educational, and professional.
+You are a Principal Project Manager evaluating Alex's 8-round admissions lifecycle dataset. 
+Review the conversation history above and format your entire final output as a strict, structured "Project Management Plan (PMP)" using these exact phase headers:
+
+### 1. Project Scope & Objective Statement
+Provide a concise, 2-sentence baseline evaluation of the team's core strategy execution.
+
+### 2. Work Breakdown Structure (WBS)
+Break down their actions into 3 critical execution work packages (e.g., Phase 1: Positioning, Phase 2: Grind, Phase 3: Deliverables). For each package, provide 2 short, bulleted tactical action items based on their gameplay.
+
+### 3. Risk Management Matrix
+Identify the highest-impact risk trap Alex encountered in their choices. Provide:
+* **Identified Risk Event:** (The threat)
+* **Real-World Impact Rating:** (Low/Medium/High)
+* **Corrective Mitigation Strategy:** (1 clear, actionable real-world solution)
+
+Format completely using Markdown headers (###) and bullet points. Keep it punchy, corporate, and token-efficient.
 `;
 
 export const GAME_ROUNDS = [

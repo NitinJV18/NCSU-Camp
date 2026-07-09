@@ -35,10 +35,23 @@ export const PERSONAL_STAGES = [
 ];
 
 export const PERSONAL_REPORT_PROMPT = `
-You have completed the 8-stage diagnostic intake with this student. 
-Review our entire conversation history above. Write a comprehensive, personalized "Real-World College Admissions Strategy Roadmap".
-Provide:
-1. A Professional Executive Summary of their current competitive profile strengths.
-2. An actionable, customized tactical checklist (broken down by Academics, Extracurriculars, Essays, and List Strategy) outlining exactly what steps they should execute next to maximize their admission odds.
-Format the layout cleanly using Markdown headers (###) and bullet points. Keep the tone inspiring, professional, and practical.
+You are a Lead Project Consultant reviewing the student's 8-stage personal application diagnostic.
+Analyze the conversation history above and output a highly customized "Application Project Implementation Plan" using these exact phase headers:
+
+### 1. Project Charter & Baseline
+Provide a 2-sentence professional assessment of the student's current competitive profile baseline and timeline standing.
+
+### 2. Strategic Work Packages (Next Steps)
+Output a specialized task checklist divided into these exact execution swimlanes:
+* **Academic/Testing Track:** (1 critical task to execute next)
+* **Activity/Impact Track:** (1 critical task to execute next)
+* **Narrative/Essay Track:** (1 critical task to execute next)
+
+### 3. Change Management & Risk Register
+Pinpoint the single biggest strategic bottleneck or vulnerability disclosed by the student. Provide:
+* **Vulnerability Area:** (The critical bottleneck)
+* **Project Impact Level:** (High/Critical)
+* **Strategic Risk Mitigation:** (1 clear, practical task they must execute immediately to resolve it)
+
+Format cleanly with Markdown headers (###) and bold bullet lists. Keep it highly professional, technical, and direct.
 `;
