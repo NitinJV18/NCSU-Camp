@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inside Alex's Brain - Simulation</title>
+    <title>Inside Alex's Brain - Dashboard Workspace</title>
     <style>
         :root {
             --ncsu-red: #CC0000;
@@ -39,6 +39,7 @@
             margin: 20px;
         }
 
+        /* Dashboard Sidebar Styling */
         .dashboard-sidebar {
             width: 320px;
             background-color: var(--ncsu-white);
@@ -47,7 +48,7 @@
             padding: 24px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 16px;
         }
 
         .sidebar-title {
@@ -74,6 +75,28 @@
         .metric-meta { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.85rem; font-weight: 600; color: #555; }
         .metric-value { font-size: 1.3rem; font-weight: 800; color: var(--ncsu-black); }
 
+        /* Navigation Tab Selection Bar */
+        .tab-navigation-bar {
+            display: flex;
+            background: #E2E2E6;
+            padding: 4px;
+            border-radius: 14px;
+            gap: 4px;
+            margin-bottom: 8px;
+        }
+
+        .tab-btn {
+            flex: 1; padding: 10px; border-radius: 10px; border: none;
+            background: transparent; color: #555; font-weight: 700;
+            font-size: 0.9rem; cursor: pointer; transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background: var(--ncsu-white); color: var(--ncsu-black);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        /* Main Workspace Panel Container */
         .chat-container {
             flex: 1;
             background-color: var(--ncsu-white);
@@ -116,14 +139,12 @@
         }
 
         .chat-messages {
-            flex: 1;
-            padding: 24px;
-            overflow-y: auto;
-            background-color: var(--chat-bg);
-            display: flex;
-            flex-direction: column;
-            gap: 18px;
+            flex: 1; padding: 24px; overflow-y: auto;
+            background-color: var(--chat-bg); display: none;
+            flex-direction: column; gap: 18px;
         }
+        
+        .chat-messages.active-view-panel { display: flex; }
 
         .message-wrapper { display: flex; gap: 12px; max-width: 85%; }
         .message-wrapper.ai { align-self: flex-start; }
@@ -141,10 +162,8 @@
         .message-wrapper.user .message { background-color: var(--ncsu-red); color: var(--ncsu-white); border-top-right-radius: 4px; }
 
         .chat-input-area {
-            padding: 18px 24px;
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            gap: 12px;
+            padding: 18px 24px; border-top: 1px solid var(--border-color);
+            display: flex; gap: 12px;
         }
 
         #user-input {
@@ -189,81 +208,178 @@
 <body>
 
     <div class="game-wrapper">
+        <!-- Dual Mode Navigation & Trackers Sidebar -->
         <aside class="dashboard-sidebar">
-            <div class="sidebar-title">Alex's Active Profile</div>
+            <nav class="tab-navigation-bar">
+                <button class="tab-btn active" id="tab-sim-btn">Class Simulation</button>
+                <button class="tab-btn" id="tab-personal-btn">My Strategy Space</button>
+            </nav>
+
+            <div class="sidebar-title" id="sidebar-context-title">Alex's Profile Metrics</div>
+            
             <div class="metric-card brain">
-                <div class="metric-meta"><span>Academic Power</span><span>The Brain</span></div>
-                <div class="metric-value" id="m-brain">50</div>
+                <div class="metric-meta"><span id="lbl-m1">Academic Power</span><span id="sub-m1">The Brain</span></div>
+                <div class="metric-value" id="v-m1">50</div>
             </div>
             <div class="metric-card heart">
-                <div class="metric-meta"><span>Impact & Passion</span><span>The Heart</span></div>
-                <div class="metric-value" id="m-heart">50</div>
+                <div class="metric-meta"><span id="lbl-m2">Impact & Passion</span><span id="sub-m2">The Heart</span></div>
+                <div class="metric-value" id="v-m2">50</div>
             </div>
             <div class="metric-card voice">
-                <div class="metric-meta"><span>Unique Story Score</span><span>The Voice</span></div>
-                <div class="metric-value" id="m-voice">50</div>
+                <div class="metric-meta"><span id="lbl-m3">Unique Story Score</span><span id="sub-m3">The Voice</span></div>
+                <div class="metric-value" id="v-m3">50</div>
             </div>
             <div class="metric-card reality">
-                <div class="metric-meta"><span>Mental Health / Budget</span><span>Reality Check</span></div>
-                <div class="metric-value" id="m-reality">50</div>
+                <div class="metric-meta"><span id="lbl-m4">Mental Health / Budget</span><span id="sub-m4">Reality Check</span></div>
+                <div class="metric-value" id="v-m4">50</div>
             </div>
         </aside>
 
+        <!-- Main Workspace Terminal Panel -->
         <main class="chat-container" style="position: relative;">
             <header class="chat-header">
                 <div class="game-title">
-                    <h1>Inside Alex's Brain</h1>
-                    <p id="act-indicator">Simulation Lobby</p>
+                    <h1 id="header-main-title">Inside Alex's Brain</h1>
+                    <p id="header-sub-title">Simulation Lobby</p>
                 </div>
-                <div class="round-banner" id="round-indicator">Pre-Game</div>
+                <div class="round-banner" id="header-round-indicator">Pre-Game</div>
             </header>
 
             <div class="active-role-indicator" id="role-banner" style="display: none;"></div>
 
-            <div class="chat-messages" id="chat-window">
+            <!-- Tab Panel Viewport 1: Classroom Simulation -->
+            <div class="chat-messages active-view-panel" id="panel-sim-view">
                 <div class="message-wrapper ai">
                     <div class="avatar">🐺</div>
                     <div class="message">
                         <h3>Welcome to the Admissions Lifecycle Simulator</h3>
                         <p style="margin-top: 6px;">Your team represents different parts of Alex's consciousness balancing their profile. Click below to begin your 8-round lifecycle journey.</p>
-                        <button id="start-game-btn" style="margin-top: 14px;">Start Simulation Game</button>
+                        <button id="start-sim-btn" style="margin-top: 14px;">Start Simulation Game</button>
                     </div>
                 </div>
             </div>
 
-            <div class="chat-input-area">
-                <input type="text" id="user-input" placeholder="Awaiting game initialization..." disabled autocomplete="off">
-                <button id="send-btn" disabled>Send Decision</button>
+            <!-- Tab Panel Viewport 2: Personal Strategy Studio -->
+            <div class="chat-messages" id="panel-personal-view">
+                <div class="message-wrapper ai">
+                    <div class="avatar">🎓</div>
+                    <div class="message">
+                        <h3>Personalized Advisory Diagnostic Studio</h3>
+                        <p style="margin-top: 6px;">This space tracks your actual high school application standings. The counselor profile will guide you through an 8-stage profile audit to assemble a competitive roadmap.</p>
+                        <button id="start-personal-btn" style="margin-top: 14px; background-color: var(--ncsu-black);">Initialize Profile Audit</button>
+                    </div>
+                </div>
             </div>
 
-            <div id="scoreboard-anchor"></div>
+            <!-- Global Action Control Bar -->
+            <div class="chat-input-area">
+                <input type="text" id="user-input" placeholder="Please select or start a workshop mode above..." disabled autocomplete="off">
+                <button id="send-btn" disabled>Submit Input</button>
+            </div>
+
+            <!-- Mount targets for end state overlays -->
+            <div id="sim-scoreboard-anchor"></div>
+            <div id="personal-scoreboard-anchor"></div>
         </main>
     </div>
 
     <script type="module">
         import { GAME_ROLES, GAME_ROUNDS, INITIAL_SYSTEM_PROMPT, REPORT_GENERATION_PROMPT } from './gameConfig.js';
+        import { PERSONAL_ROLES, PERSONAL_SYSTEM_PROMPT, PERSONAL_STAGES, PERSONAL_REPORT_PROMPT } from './personalConfig.js';
 
-        let currentRoundIndex = 0;
-        let scores = { BRAIN: 50, HEART: 50, VOICE: 50, REALITY: 50 };
-        let conversationLog = [];
+        // Application State Management Registry
+        let currentMode = 'SIM'; // Options: 'SIM' | 'PERSONAL'
+        let simStarted = false, personalStarted = false;
+        
+        let simRoundIndex = 0;
+        let simScores = { BRAIN: 50, HEART: 50, VOICE: 50, REALITY: 50 };
+        let simConversationLog = [];
 
-        const chatWindow = document.getElementById('chat-window');
+        let personalStageIndex = 0;
+        let personalScores = { PROFILE: 50, ENGAGEMENT: 50, NARRATIVE: 50, STRATEGY: 50 };
+        let personalConversationLog = [];
+
+        // UI Element Hooks
         const userInput = document.getElementById('user-input');
         const sendBtn = document.getElementById('send-btn');
-        const startGameBtn = document.getElementById('start-game-btn');
-        const roundIndicator = document.getElementById('round-indicator');
-        const actIndicator = document.getElementById('act-indicator');
         const roleBanner = document.getElementById('role-banner');
 
-        startGameBtn.addEventListener('click', beginGameSequence);
-        sendBtn.addEventListener('click', processRoundSubmission);
-        userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') processRoundSubmission(); });
+        // Tab selection handles
+        document.getElementById('tab-sim-btn').addEventListener('click', () => switchWorkspaceMode('SIM'));
+        document.getElementById('tab-personal-btn').addEventListener('click', () => switchWorkspaceMode('PERSONAL'));
+        
+        // Mode trigger setups
+        document.getElementById('start-sim-btn').addEventListener('click', startSimEngine);
+        document.getElementById('start-personal-btn').addEventListener('click', startPersonalEngine);
+        
+        sendBtn.addEventListener('click', processActiveInputRoute);
+        userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') processActiveInputRoute(); });
 
-        function updateDashboardUI() {
-            document.getElementById('m-brain').textContent = scores.BRAIN;
-            document.getElementById('m-heart').textContent = scores.HEART;
-            document.getElementById('m-voice').textContent = scores.VOICE;
-            document.getElementById('m-reality').textContent = scores.REALITY;
+        function switchWorkspaceMode(targetMode) {
+            if (currentMode === targetMode) return;
+            currentMode = targetMode;
+
+            // Toggle layout tab button selection styling classes
+            document.getElementById('tab-sim-btn').classList.toggle('active', targetMode === 'SIM');
+            document.getElementById('tab-personal-btn').classList.toggle('active', targetMode === 'PERSONAL');
+
+            // Swap visible presentation layer viewports
+            document.getElementById('panel-sim-view').classList.toggle('active-view-panel', targetMode === 'SIM');
+            document.getElementById('panel-personal-view').classList.toggle('active-view-panel', targetMode === 'PERSONAL');
+
+            if (targetMode === 'SIM') {
+                document.getElementById('header-main-title').textContent = "Inside Alex's Brain";
+                document.getElementById('sidebar-context-title').textContent = "Alex's Profile Metrics";
+                renderSidebarMetricsLayout(simScores, GAME_ROLES, 'BRAIN', 'HEART', 'VOICE', 'REALITY');
+                
+                if (simStarted) {
+                    userInput.disabled = (simRoundIndex >= GAME_ROUNDS.length);
+                    sendBtn.disabled = userInput.disabled;
+                    userInput.placeholder = "Enter your strategy choice...";
+                    loadSimRound(simRoundIndex);
+                } else {
+                    resetInputStateToLobby();
+                }
+            } else {
+                document.getElementById('header-main-title').textContent = "My Admissions Workspace";
+                document.getElementById('sidebar-context-title').textContent = "My Profile Standings";
+                renderSidebarMetricsLayout(personalScores, PERSONAL_ROLES, 'PROFILE', 'ENGAGEMENT', 'NARRATIVE', 'STRATEGY');
+                
+                if (personalStarted) {
+                    userInput.disabled = (personalStageIndex >= PERSONAL_STAGES.length);
+                    sendBtn.disabled = userInput.disabled;
+                    userInput.placeholder = "Type your personal reflection details...";
+                    loadPersonalStage(personalStageIndex);
+                } else {
+                    resetInputStateToLobby();
+                }
+            }
+        }
+
+        function resetInputStateToLobby() {
+            userInput.disabled = true; sendBtn.disabled = true;
+            userInput.placeholder = "Please switch or initialize workspace mode...";
+            roleBanner.style.display = "none";
+            document.getElementById('header-round-indicator').textContent = "Pre-Game";
+            document.getElementById('header-sub-title').textContent = "Workspace Lobby";
+        }
+
+        function renderSidebarMetricsLayout(scoreMap, identityMap, k1, k2, k3, k4) {
+            document.getElementById('lbl-m1').textContent = identityMap[k1].tracker || identityMap[k1].name;
+            document.getElementById('sub-m1').textContent = identityMap[k1].name;
+            document.getElementById('v-m1').textContent = scoreMap[k1];
+
+            document.getElementById('lbl-m2').textContent = identityMap[k2].tracker || identityMap[k2].name;
+            document.getElementById('sub-m2').textContent = identityMap[k2].name;
+            document.getElementById('v-m2').textContent = scoreMap[k2];
+
+            document.getElementById('lbl-m3').textContent = identityMap[k3].tracker || identityMap[k3].name;
+            document.getElementById('sub-m3').textContent = identityMap[k3].name;
+            document.getElementById('v-m3').textContent = scoreMap[k3];
+
+            document.getElementById('lbl-m4').textContent = identityMap[k4].tracker || identityMap[k4].name;
+            document.getElementById('sub-m4').textContent = identityMap[k4].name;
+            document.getElementById('v-m4').textContent = scoreMap[k4];
         }
 
         function renderMarkdown(text) {
@@ -274,13 +390,14 @@
                 .replace(/\n/g, '<br>');
         }
 
-        function appendMessage(text, sender, customizedIcon = "🐺") {
+        function appendTargetedMessage(panelId, text, sender, icon = "🐺") {
+            const panel = document.getElementById(panelId);
             const wrapper = document.createElement('div');
             wrapper.classList.add('message-wrapper', sender);
 
             const avatar = document.createElement('div');
             avatar.classList.add('avatar');
-            avatar.innerHTML = sender === 'ai' ? customizedIcon : "👤";
+            avatar.innerHTML = sender === 'ai' ? icon : "👤";
 
             const msgDiv = document.createElement('div');
             msgDiv.classList.add('message');
@@ -288,190 +405,208 @@
 
             wrapper.appendChild(avatar);
             wrapper.appendChild(msgDiv);
-            chatWindow.appendChild(wrapper);
-            chatWindow.scrollTop = chatWindow.scrollHeight;
+            panel.appendChild(wrapper);
+            panel.scrollTop = panel.scrollHeight;
         }
 
-        function beginGameSequence() {
-            startGameBtn.disabled = true;
-            userInput.disabled = false;
-            sendBtn.disabled = false;
+        // ================= CLASS SIMULATION PATH ROUTINES =================
+        function startSimEngine() {
+            simStarted = true; document.getElementById('start-sim-btn').disabled = true;
+            userInput.disabled = false; sendBtn.disabled = false;
             userInput.placeholder = "Enter your strategy choice...";
-            conversationLog.push({ role: "user", content: INITIAL_SYSTEM_PROMPT });
-            loadRound(0);
+            simConversationLog.push({ role: "user", content: INITIAL_SYSTEM_PROMPT });
+            loadSimRound(0);
         }
 
-        function loadRound(index) {
-            if (index >= GAME_ROUNDS.length) {
-                renderEndgameScoreboard();
-                return;
-            }
-
-            currentRoundIndex = index;
+        function loadSimRound(index) {
+            if (index >= GAME_ROUNDS.length) { renderSimScoreboard(); return; }
+            simRoundIndex = index;
             const roundData = GAME_ROUNDS[index];
-
-            roundIndicator.textContent = `Round ${roundData.round} / 8`;
-            actIndicator.textContent = roundData.act;
+            document.getElementById('header-round-indicator').textContent = `Round ${roundData.round} / 8`;
+            document.getElementById('header-sub-title').textContent = roundData.act;
 
             if (roundData.role === "TEAM") {
-                roleBanner.style.display = "flex";
-                roleBanner.style.backgroundColor = "#F7FAFC";
-                roleBanner.style.color = "#111";
+                roleBanner.style.display = "flex"; roleBanner.style.backgroundColor = "#F7FAFC"; roleBanner.style.color = "#111";
                 roleBanner.innerHTML = `<strong>Active Typist:</strong> All Roles / Co-op Team Round!`;
             } else {
-                const roleMeta = GAME_ROLES[roundData.role];
-                roleBanner.style.display = "flex";
-                roleBanner.style.backgroundColor = `${roleMeta.color}15`;
-                roleBanner.style.color = roleMeta.color;
-                roleBanner.innerHTML = `${roleMeta.icon} <span style="margin-left: 8px;"><strong>Active Typist:</strong> ${roleMeta.name}</span>`;
+                const rMeta = GAME_ROLES[roundData.role];
+                roleBanner.style.display = "flex"; roleBanner.style.backgroundColor = `${rMeta.color}15`; roleBanner.style.color = rMeta.color;
+                roleBanner.innerHTML = `${rMeta.icon} <span style="margin-left:8px;"><strong>Active Typist:</strong> ${rMeta.name}</span>`;
             }
-
-            const scenarioContextText = `<strong>Scenario:</strong> ${roundData.scenario}<br><br><strong>Your Goal:</strong> ${roundData.goal}`;
-            appendMessage(scenarioContextText, "ai", "📋");
+            appendTargetedMessage('panel-sim-view', `<strong>Scenario:</strong> ${roundData.scenario}<br><br><strong>Your Goal:</strong> ${roundData.goal}`, "ai", "📋");
         }
 
-        async function processRoundSubmission() {
-            const promptValue = userInput.value.trim();
-            if (!promptValue) return;
+        // ================= PERSONAL APPLICATION PATH ROUTINES =================
+        function startPersonalEngine() {
+            personalStarted = true; document.getElementById('start-personal-btn').disabled = true;
+            userInput.disabled = false; sendBtn.disabled = false;
+            userInput.placeholder = "Type your personal reflection details...";
+            personalConversationLog.push({ role: "user", content: PERSONAL_SYSTEM_PROMPT });
+            loadPersonalStage(0);
+        }
 
-            appendMessage(promptValue, "user");
-            userInput.value = "";
-            userInput.disabled = true;
-            sendBtn.disabled = true;
+        function loadPersonalStage(index) {
+            if (index >= PERSONAL_STAGES.length) { renderPersonalScoreboard(); return; }
+            personalStageIndex = index;
+            const stageData = PERSONAL_STAGES[index];
+            document.getElementById('header-round-indicator').textContent = `Stage ${stageData.stage} / 8`;
+            document.getElementById('header-sub-title').textContent = `Diagnostic: ${stageData.topic}`;
+            
+            roleBanner.style.display = "flex"; roleBanner.style.backgroundColor = "#EBF8FF"; roleBanner.style.color = "#2B6CB0";
+            roleBanner.innerHTML = `🎓 <span style="margin-left:8px;"><strong>Counselor Step:</strong> Exploring ${stageData.topic}</span>`;
+            
+            // Only inject if message stream window panel workspace node is empty
+            if (document.getElementById('panel-personal-view').children.length <= 1 + index * 2) {
+                appendTargetedMessage('panel-personal-view', stageData.prompt, "ai", "🎓");
+            }
+        }
 
-            const roundData = GAME_ROUNDS[currentRoundIndex];
-            const systemContextualizedPrompt = `[ROUND ${roundData.round} EVALUATION - ROLE: ${roundData.role}]\nStudent Decision Input: ${promptValue}`;
-            conversationLog.push({ role: "user", content: systemContextualizedPrompt });
+        // ================= UNIFIED PIPELINE ROUTING CONTROLLER =================
+        function processActiveInputRoute() {
+            const val = userInput.value.trim();
+            if (!val) return;
 
-            appendMessage("Evaluating choice parameters...", "ai", "⏳");
-            const processingBubble = chatWindow.lastChild.querySelector('.message');
+            if (currentMode === 'SIM') {
+                appendTargetedMessage('panel-sim-view', val, 'user');
+                userInput.value = ''; userInput.disabled = true; sendBtn.disabled = true;
+                executeSimStepRequest(val);
+            } else {
+                appendTargetedMessage('panel-personal-view', val, 'user');
+                userInput.value = ''; userInput.disabled = true; sendBtn.disabled = true;
+                executePersonalStepRequest(val);
+            }
+        }
+
+        async function executeSimStepRequest(val) {
+            const roundData = GAME_ROUNDS[simRoundIndex];
+            simConversationLog.push({ role: "user", content: `[ROUND ${roundData.round} EVAL - ROLE: ${roundData.role}]\nDecision: ${val}` });
+            appendTargetedMessage('panel-sim-view', "Evaluating choice parameters...", "ai", "⏳");
+            const bubble = document.getElementById('panel-sim-view').lastChild.querySelector('.message');
 
             try {
-                const response = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt: JSON.stringify(conversationLog) })
+                const res = await fetch('/api/chat', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: JSON.stringify(simConversationLog) })
                 });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    processingBubble.innerHTML = renderMarkdown(data.text);
-                    conversationLog.push({ role: "model", content: data.text });
-                    
-                    extractMetricAdjustments(data.text);
-                    updateDashboardUI();
-
-                    setTimeout(() => {
-                        loadRound(currentRoundIndex + 1);
-                        userInput.disabled = false;
-                        sendBtn.disabled = false;
-                    }, 1000);
-
-                } else {
-                    processingBubble.textContent = `Error: ${data.error}`;
-                }
-            } catch (err) {
-                processingBubble.textContent = "Fatal Connection Timeout connecting to server engine loop.";
-                console.error(err);
-            }
+                const data = await res.json();
+                if (res.ok) {
+                    bubble.innerHTML = renderMarkdown(data.text);
+                    simConversationLog.push({ role: "model", content: data.text });
+                    parseMetricsHarvesting(data.text, simScores, { BRAIN: /\[ACADEMIC_POWER:\s*([+-]\d+)\]/i, HEART: /\[IMPACT_PASSION:\s*([+-]\d+)\]/i, VOICE: /\[UNIQUE_STORY:\s*([+-]\d+)\]/i, REALITY: /\[MENTAL_HEALTH_BUDGET:\s*([+-]\d+)\]/i });
+                    renderSidebarMetricsLayout(simScores, GAME_ROLES, 'BRAIN', 'HEART', 'VOICE', 'REALITY');
+                    setTimeout(() => { loadSimRound(simRoundIndex + 1); userInput.disabled = false; sendBtn.disabled = false; }, 1000);
+                } else { bubble.textContent = `Error: ${data.error}`; }
+            } catch (err) { bubble.textContent = "Connection drop."; }
         }
 
-        function extractMetricAdjustments(rawText) {
-            const regexes = {
-                BRAIN: /\[ACADEMIC_POWER:\s*([+-]\d+)\]/i,
-                HEART: /\[IMPACT_PASSION:\s*([+-]\d+)\]/i,
-                VOICE: /\[UNIQUE_STORY:\s*([+-]\d+)\]/i,
-                REALITY: /\[MENTAL_HEALTH_BUDGET:\s*([+-]\d+)\]/i
-            };
+        async function executePersonalStepRequest(val) {
+            const stageData = PERSONAL_STAGES[personalStageIndex];
+            personalConversationLog.push({ role: "user", content: `[STAGE ${stageData.stage} DIAGNOSTIC - TOPIC: ${stageData.topic}]\nStudent State Input: ${val}` });
+            appendTargetedMessage('panel-personal-view', "Counselor is evaluating your response profiles...", "ai", "⏳");
+            const bubble = document.getElementById('panel-personal-view').lastChild.querySelector('.message');
 
-            for (const key in regexes) {
-                const match = rawText.match(regexes[key]);
+            try {
+                const res = await fetch('/api/chat', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: JSON.stringify(personalConversationLog) })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    bubble.innerHTML = renderMarkdown(data.text);
+                    personalConversationLog.push({ role: "model", content: data.text });
+                    parseMetricsHarvesting(data.text, personalScores, { PROFILE: /\[ACADEMIC_READINESS:\s*([+-]\d+)\]/i, ENGAGEMENT: /\[ACTIVITY_IMPACT:\s*([+-]\d+)\]/i, NARRATIVE: /\[STORY_AUTHENTICITY:\s*([+-]\d+)\]/i, STRATEGY: /\[STRATEGIC_PLANNING:\s*([+-]\d+)\]/i });
+                    renderSidebarMetricsLayout(personalScores, PERSONAL_ROLES, 'PROFILE', 'ENGAGEMENT', 'NARRATIVE', 'STRATEGY');
+                    setTimeout(() => { loadPersonalStage(personalStageIndex + 1); userInput.disabled = false; sendBtn.disabled = false; }, 1000);
+                } else { bubble.textContent = `Error: ${data.error}`; }
+            } catch (err) { bubble.textContent = "Connection dropped."; }
+        }
+
+        function parseMetricsHarvesting(text, scoreStore, expressionsMap) {
+            for (const key in expressionsMap) {
+                const match = text.match(expressionsMap[key]);
                 if (match) {
-                    const adjustment = parseInt(match[1], 10);
-                    scores[key] = Math.min(100, Math.max(0, scores[key] + adjustment));
+                    const diff = parseInt(match[1], 10);
+                    scoreStore[key] = Math.min(100, Math.max(0, scoreStore[key] + diff));
                 }
             }
         }
 
-        function renderEndgameScoreboard() {
-            userInput.disabled = true;
-            sendBtn.disabled = true;
-            roleBanner.style.display = "none";
-            
-            const finalAverage = Math.round((scores.BRAIN + scores.HEART + scores.VOICE + scores.REALITY) / 4);
-            let archetype = "", description = "";
+        function renderSimScoreboard() {
+            userInput.disabled = true; sendBtn.disabled = true; roleBanner.style.display = "none";
+            const avg = Math.round((simScores.BRAIN + simScores.HEART + simScores.VOICE + simScores.REALITY) / 4);
+            let arch = "", desc = "";
+            if (avg >= 85) { arch = "The Balanced Scholar"; desc = "Alex built a compelling profile while completely shielding personal mental boundaries and out-of-pocket costs."; }
+            else if (avg >= 70) { arch = "The Safe Bet"; desc = "Alex navigated options securely but left strategic opportunities on the text layout matrix unexecuted."; }
+            else { arch = "The Burnout profile"; desc = "Alex prioritized corporate metric vanity strings over human sustainability boundaries."; }
 
-            if (finalAverage >= 85) { archetype = "The Balanced Scholar"; description = "Alex got into an incredible university, kept their mental health pristine, avoided predatory debt, and built a deeply compelling personal story."; }
-            else if (finalAverage >= 70) { archetype = "The Safe Bet"; description = "Alex navigated the system successfully. They made safe choices, though they left some potential on the table by playing it a bit too cautious."; }
-            else if (finalAverage >= 50) { archetype = "The Burnout"; description = "Alex prioritized brand name and numbers over human strategy. They survived the cycle, but entered college highly stressed or burdened with debt."; }
-            else { archetype = "The Resume Robot"; description = "Alex built a completely artificial profile based on what they thought colleges wanted to see, completely losing their authentic voice."; }
-
-            const scoreboardAnchor = document.getElementById('scoreboard-anchor');
-            scoreboardAnchor.innerHTML = `
+            document.getElementById('sim-scoreboard-anchor').innerHTML = `
                 <div class="scoreboard-layer">
-                    <h2 style="font-size: 2rem; color: var(--ncsu-red); font-weight:800;">Simulation Complete!</h2>
-                    
+                    <h2>Simulation Complete!</h2>
                     <table class="score-table">
-                        <thead><tr><th>Metric Tracker Profile</th><th>Final Score</th></tr></thead>
+                        <thead><tr><th>Metric Profile</th><th>Final Standings</th></tr></thead>
                         <tbody>
-                            <tr><td>Academic Power (The Brain)</td><td><strong>${scores.BRAIN} / 100</strong></td></tr>
-                            <tr><td>Impact & Passion (The Heart)</td><td><strong>${scores.HEART} / 100</strong></td></tr>
-                            <tr><td>Unique Story Score (The Voice)</td><td><strong>${scores.VOICE} / 100</strong></td></tr>
-                            <tr><td>Mental Health & Budget (Reality Check)</td><td><strong>${scores.REALITY} / 100</strong></td></tr>
-                            <tr style="background: #F7FAFC; color: var(--ncsu-red);"><td><strong>Overall Synergy Average</strong></td><td><strong>${finalAverage} / 100</strong></td></tr>
+                            <tr><td>Academic Power</td><td><strong>${simScores.BRAIN} / 100</strong></td></tr>
+                            <tr><td>Impact & Passion</td><td><strong>${simScores.HEART} / 100</strong></td></tr>
+                            <tr><td>Unique Story Score</td><td><strong>${simScores.VOICE} / 100</strong></td></tr>
+                            <tr><td>Mental Health & Budget</td><td><strong>${simScores.REALITY} / 100</strong></td></tr>
+                            <tr style="color:var(--ncsu-red);"><td><strong>Synergy Average</strong></td><td><strong>${avg} / 100</strong></td></tr>
                         </tbody>
                     </table>
-
-                    <div style="background: white; padding: 24px; border-radius:16px; border: 1px solid var(--border-color); max-width:600px; text-align:center; width:100%;">
-                        <h3 style="font-size: 1.2rem; margin-bottom: 8px;">Final Archetype: ${archetype}</h3>
-                        <p style="color: #4A5568; line-height:1.5; font-size:0.95rem;">${description}</p>
-                        <button id="generate-report-btn" style="margin-top:16px; width:100%;">Generate Counselor Blueprint Report</button>
+                    <div class="report-box" style="text-align:center;">
+                        <h3>Final Profile Archetype: ${arch}</h3><p>${desc}</p>
+                        <button id="gen-sim-report" style="margin-top:14px; width:100%;">Generate Simulation Report Summary</button>
                     </div>
-                    
-                    <div id="report-output-box" class="report-box" style="display:none;">
-                        <h3>Admissions Advisory Blueprint</h3>
-                        <div id="report-text">Analyzing performance matrices...</div>
-                    </div>
+                    <div id="sim-report-output" class="report-box" style="display:none; width:100%;"><h3>Counselor Breakdown Summary</h3><div id="sim-report-txt">Compiling...</div></div>
                 </div>
             `;
-
-            document.getElementById('generate-report-btn').addEventListener('click', fetchCounselorReport);
+            document.getElementById('gen-sim-report').addEventListener('click', () => triggerReportFetch(simConversationLog, REPORT_GENERATION_PROMPT, 'gen-sim-report', 'sim-report-output', 'sim-report-txt'));
         }
 
-        async function fetchCounselorReport() {
-            const rptBtn = document.getElementById('generate-report-btn');
-            const rptBox = document.getElementById('report-output-box');
-            const rptText = document.getElementById('report-text');
+        function renderPersonalScoreboard() {
+            userInput.disabled = true; sendBtn.disabled = true; roleBanner.style.display = "none";
+            const avg = Math.round((personalScores.PROFILE + personalScores.ENGAGEMENT + personalScores.NARRATIVE + personalScores.STRATEGY) / 4);
+            
+            document.getElementById('personal-scoreboard-anchor').innerHTML = `
+                <div class="scoreboard-layer">
+                    <h2>Profile Diagnostic Complete!</h2>
+                    <table class="score-table">
+                        <thead><tr><th>Application Metric Component</th><th>Calculated Score</th></tr></thead>
+                        <tbody>
+                            <tr><td>Academic Readiness</td><td><strong>${personalScores.PROFILE} / 100</strong></td></tr>
+                            <tr><td>Activity Impact Balance</td><td><strong>${personalScores.ENGAGEMENT} / 100</strong></td></tr>
+                            <tr><td>Story Authenticity Alignment</td><td><strong>${personalScores.NARRATIVE} / 100</strong></td></tr>
+                            <tr><td>Strategic Milestone Planning</td><td><strong>${personalScores.STRATEGY} / 100</strong></td></tr>
+                            <tr style="color:var(--brain-color);"><td><strong>Application Readiness Matrix Index</strong></td><td><strong>${avg} / 100</strong></td></tr>
+                        </tbody>
+                    </table>
+                    <div class="report-box" style="text-align:center;">
+                        <h3>Diagnostic Mapping Formulated</h3>
+                        <p>Your responses have been processed against competitive institutional acceptance indices.</p>
+                        <button id="gen-personal-report" style="margin-top:14px; width:100%; background-color:var(--brain-color);">Generate Strategic Roadmap Report</button>
+                    </div>
+                    <div id="personal-report-output" class="report-box" style="display:none; width:100%;"><h3>Personalized Strategic Roadmap</h3><div id="personal-report-txt">Processing conversational dataset...</div></div>
+                </div>
+            `;
+            document.getElementById('gen-personal-report').addEventListener('click', () => triggerReportFetch(personalConversationLog, PERSONAL_REPORT_PROMPT, 'gen-personal-report', 'personal-report-output', 'personal-report-txt'));
+        }
 
-            rptBtn.disabled = true;
-            rptBtn.textContent = "Compiling Analytics Report...";
-            rptBox.style.display = "block";
-
-            // Push the special analysis prompt into the session log tracking matrix
-            conversationLog.push({ role: "user", content: REPORT_GENERATION_PROMPT });
+        async function triggerReportFetch(log, systemPrompt, btnId, boxId, textId) {
+            const btn = document.getElementById(btnId);
+            const box = document.getElementById(boxId);
+            const txt = document.getElementById(textId);
+            btn.disabled = true; btn.textContent = "Compiling Personalized Analytics...";
+            box.style.display = "block";
+            log.push({ role: "user", content: systemPrompt });
 
             try {
-                const response = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt: JSON.stringify(conversationLog) })
+                const res = await fetch('/api/chat', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: JSON.stringify(log) })
                 });
-
-                const data = await response.json();
-                if (response.ok) {
-                    rptText.innerHTML = renderMarkdown(data.text);
-                    rptBtn.textContent = "Report Generated Successfully";
-                } else {
-                    rptText.textContent = `Error compiling details: ${data.error}`;
-                    rptBtn.disabled = false;
-                    rptBtn.textContent = "Retry Report Generation";
-                }
-            } catch (err) {
-                rptText.textContent = "Connection drop while communicating with analysis matrix engine.";
-                rptBtn.disabled = false;
-                rptBtn.textContent = "Retry Report Generation";
-            }
+                const data = await res.json();
+                if (res.ok) { txt.innerHTML = renderMarkdown(data.text); btn.textContent = "Blueprint Summary Ready"; }
+                else { txt.textContent = `Error: ${data.error}`; btn.disabled = false; }
+            } catch (err) { txt.textContent = "Network timeout execution crash."; btn.disabled = false; }
         }
     </script>
 </body>
