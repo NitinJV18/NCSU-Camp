@@ -43,22 +43,25 @@ Format to output at the very end:
 `;
 
 export const REPORT_GENERATION_PROMPT = `
-You are a Principal Project Manager evaluating Alex's 8-round admissions lifecycle dataset. 
-Review the conversation history above and format your entire final output as a strict, structured "Project Management Plan (PMP)" using these exact phase headers:
+You are an expert Admissions Consultant and Project Director reviewing Alex's 8-round lifecycle dataset. 
+Analyze the entire conversation history above and provide a token-efficient, structured "Strategic Performance Audit" using these exact headers:
 
-### 1. Project Scope & Objective Statement
-Provide a concise, 2-sentence baseline evaluation of the team's core strategy execution.
+### 1. Strategy Evaluation & Performance Scope
+Provide a 2-sentence direct assessment of the team's overarching strategy. Critique what they balanced well and where their perspective on admissions was flawed or realistic.
 
-### 2. Work Breakdown Structure (WBS)
-Break down their actions into 3 critical execution work packages (e.g., Phase 1: Positioning, Phase 2: Grind, Phase 3: Deliverables). For each package, provide 2 short, bulleted tactical action items based on their gameplay.
+### 2. Milestone Work Packages & Feedback
+Break down their actual decisions into 3 constructive feedback work packages:
+* **Academic & List Management:** (1 sentence analyzing their choice + 1 actionable real-world tip)
+* **Extracurricular Impact:** (1 sentence analyzing their choice + 1 actionable real-world tip)
+* **Authentic Narrative/Voice:** (1 sentence analyzing their choice + 1 actionable real-world tip)
 
-### 3. Risk Management Matrix
-Identify the highest-impact risk trap Alex encountered in their choices. Provide:
-* **Identified Risk Event:** (The threat)
-* **Real-World Impact Rating:** (Low/Medium/High)
-* **Corrective Mitigation Strategy:** (1 clear, actionable real-world solution)
+### 3. Risk Mitigation & Quality Control Register
+Identify the single biggest error or strategic trap the team fell into during the simulation.
+* **Identified Strategy Flaw:** (The core mistake they made)
+* **Real-World Admissions Impact:** (Why this hurts a student's real chances)
+* **Corrective Quality Action:** (1 precise, constructive maneuver to fix or avoid this trap in real life)
 
-Format completely using Markdown headers (###) and bullet points. Keep it punchy, corporate, and token-efficient.
+Format cleanly using Markdown headers (###) and bullet points. Keep it highly educational, corrective, and blunt.
 `;
 
 export const GAME_ROUNDS = [
