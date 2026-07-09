@@ -383,12 +383,47 @@
         }
 
         function renderMarkdown(text) {
-            return text
-                .replace(/^### (.*$)/gim, '<h3>$1</h3>')
-                .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
-                .replace(/\*(.*?)\*/gim, '<em>$1</em>')
-                .replace(/\n/g, '<br>');
+    if (!text) return "";
+
+    // 1. Handle literal or double-escaped newlines safely first
+    let html = text.replace(/\\n/g, '\n');
+
+    // 2. Parse Headers (#, ##, ###) while ensuring they sit at line boundaries
+    html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+    html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+    html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+
+    // 3. Parse Bold (**text**) and Italics (*text*)
+    html = html.replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>');
+    html = html.replace(/\*(.*?)\*/gim, '<em>$1</em>');
+
+    // 4. Clean up lists/bullet points (* item) line by line
+    let lines = html.split('\n');
+    let inList = false;
+
+    for (let i = 0; i < lines.length; i++) {
+        let trimmed = lines[i].trim();
+        if (trimmed.startsWith('* ')) {
+            lines[i] = `<li>${trimmed.substring(2)}</li>`;
+            if (!inList) {
+                lines[i] = '<ul>' + lines[i];
+                inList = true;
+            }
+        } else if (inList && trimmed === '') {
+            // Keep empty lines inside lists clean
+            continue;
+        } else if (inList) {
+            lines[i] = '</ul>' + lines[i];
+            inList = false;
         }
+    }
+    if (inList) {
+        lines[lines.length - 1] += '</ul>';
+    }
+
+    // 5. Join lines back and replace remaining individual structural newlines with clean line breaks
+    return lines.join('\n').replace(/\n/g, '<br>');
+}
 
         function appendTargetedMessage(panelId, text, sender, icon = "🐺") {
             const panel = document.getElementById(panelId);
