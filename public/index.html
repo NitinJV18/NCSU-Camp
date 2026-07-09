@@ -644,7 +644,8 @@
                 const match = text.match(expressionsMap[key]);
                 if (match) {
                     const diff = parseInt(match[1], 10);
-                    scoreStore[key] = Math.min(100, Math.max(0, scoreStore[key] + diff));
+                    // hard cap set at 95/100 so there is always room for improvement
+                    scoreStore[key] = Math.min(95, Math.max(0, scoreStore[key] + diff));
                 }
             }
         }
